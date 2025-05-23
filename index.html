@@ -146,6 +146,68 @@
             margin: 20px 0;
         }
 
+        /* Nueva sección de estado en tiempo real */
+        .live-status {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #c0392b;
+        }
+
+        .live-status h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-status .pulse {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .live-requirement {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #fff;
+        }
+
+        .live-requirement h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .requirement-detail {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 0.95rem;
+        }
+
+        .urgent {
+            animation: urgentBlink 2s infinite;
+        }
+
+        @keyframes urgentBlink {
+            0%, 50% { background: rgba(255, 255, 255, 0.1); }
+            25%, 75% { background: rgba(255, 255, 255, 0.3); }
+        }
+
         .vuelta-section {
             background: #fff3cd;
             padding: 20px;
@@ -544,6 +606,17 @@
                 </table>
             </div>
 
+            <!-- Nueva sección de estado en tiempo real -->
+            <div class="live-status" id="liveStatus">
+                <h3>
+                    <div class="pulse"></div>
+                    ESTADO EN TIEMPO REAL - Requisitos para el Título
+                </h3>
+                <div id="liveStatusContent">
+                    <!-- Se actualiza dinámicamente -->
+                </div>
+            </div>
+
             <div id="championSection" class="champion-section">
                 <div class="trophy"><i class="fas fa-trophy"></i></div>
                 <h2 id="championName">¡CAMPEÓN!</h2>
@@ -565,7 +638,7 @@
 
             <div class="scenario-section">
                 <button class="scenario-toggle" onclick="toggleScenarios()">
-                    <span><i class="fas fa-calculator"></i> Escenarios para ser Campeón</span>
+                    <span><i class="fas fa-calculator"></i> Escenarios Generales</span>
                     <i class="fas fa-chevron-down" id="scenarioIcon"></i>
                 </button>
                 <div id="scenarioContent" class="scenario-content">
@@ -696,6 +769,7 @@
                 
                 actualizarResumenFinal();
                 actualizarResumenVuelta();
+                actualizarEstadoTiempoReal(); // Nueva función
                 verificarCampeon();
                 actualizarEscenarios();
             }
@@ -708,9 +782,156 @@
                 recalcularPartido(partidoId);
                 actualizarResumenFinal();
                 actualizarResumenVuelta();
+                actualizarEstadoTiempoReal(); // Nueva función
                 verificarCampeon();
                 actualizarEscenarios();
             }
+        }
+
+        // NUEVA FUNCIÓN: Actualizar estado en tiempo real
+        function actualizarEstadoTiempoReal() {
+            const resultados = calcularResultadosFinal();
+            const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
+            const partidosEnCurso = Object.keys(partidosVuelta).filter(id => 
+                partidosVuelta[id].sets.length > 0 && !partidosVuelta[id].finalizado
+            );
+
+            let contenido = '';
+
+            if (partidosRestantes === 0) {
+                contenido = '<div class="live-requirement"><h4>🏁 Encuentro Finalizado</h4><div class="requirement-detail">Todos los partidos han sido completados</div></div>';
+            } else {
+                // Análisis para IES La Orden
+                const requisitoIES = calcularRequisitoEspecifico('recreativo', resultados, partidosRestantes, partidosEnCurso);
+                contenido += generarRequisitoHTML('IES La Orden', requisitoIES, 'recreativo');
+
+                // Análisis para Cartagena  
+                const requisitoCartagena = calcularRequisitoEspecifico('cartagena', resultados, partidosRestantes, partidosEnCurso);
+                contenido += generarRequisitoHTML('Cartagena', requisitoCartagena, 'cartagena');
+            }
+
+            document.getElementById('liveStatusContent').innerHTML = contenido;
+        }
+
+        function calcularRequisitoEspecifico(equipo, resultados, partidosRestantes, partidosEnCurso) {
+            const equipoActual = equipo === 'recreativo' ? resultados.recreativo : resultados.cartagena;
+            const rivalActual = equipo === 'recreativo' ? resultados.cartagena : resultados.recreativo;
+            
+            const partidosRestantesSinEnCurso = partidosRestantes - partidosEnCurso.length;
+            
+            // Análisis de partidos en curso
+            let detallesEnCurso = [];
+            partidosEnCurso.forEach(partidoId => {
+                const partido = partidosVuelta[partidoId];
+                const setsEquipo = equipo === 'recreativo' ? partido.setsRecreativo : partido.setsCartagena;
+                const setsRival = equipo === 'recreativo' ? partido.setsCartagena : partido.setsRecreativo;
+                
+                if (setsEquipo >= 3) {
+                    detallesEnCurso.push(`${nombresPartidos[partidoId]}: ✅ Ya ganado`);
+                } else if (setsRival >= 3) {
+                    detallesEnCurso.push(`${nombresPartidos[partidoId]}: ❌ Ya perdido`);
+                } else {
+                    const setsNecesarios = 3 - setsEquipo;
+                    const setsMaximosRival = 3 - setsRival;
+                    detallesEnCurso.push(`${nombresPartidos[partidoId]}: Necesita ${setsNecesarios} sets más (rival a ${setsMaximosRival} sets de ganar)`);
+                }
+            });
+
+            // Calcular diferentes escenarios
+            for (let partidosAGanar = 0; partidosAGanar <= partidosRestantes; partidosAGanar++) {
+                const partidosFinalesEquipo = equipoActual.partidos + partidosAGanar;
+                const partidosFinalesRival = rivalActual.partidos + (partidosRestantes - partidosAGanar);
+                
+                if (partidosFinalesEquipo > partidosFinalesRival) {
+                    return {
+                        tipo: 'partidos',
+                        partidosNecesarios: partidosAGanar,
+                        descripcion: `Ganar ${partidosAGanar} de los ${partidosRestantes} partidos restantes`,
+                        detallePartidos: `Resultado final: ${partidosFinalesEquipo} vs ${partidosFinalesRival} partidos`,
+                        urgencia: partidosAGanar === partidosRestantes ? 'alta' : 'media',
+                        enCurso: detallesEnCurso
+                    };
+                } else if (partidosFinalesEquipo === partidosFinalesRival) {
+                    // Empate en partidos, calcular por sets
+                    const setsMaxRival = rivalActual.sets + (partidosRestantes - partidosAGanar) * 3;
+                    const setsNecesarios = setsMaxRival + 1 - equipoActual.sets;
+                    const setsDisponibles = partidosAGanar * 3;
+                    
+                    if (setsNecesarios <= setsDisponibles) {
+                        const setsCedidosMaximos = setsDisponibles - setsNecesarios;
+                        return {
+                            tipo: 'sets',
+                            partidosNecesarios: partidosAGanar,
+                            setsNecesarios: setsNecesarios,
+                            setsCedidosMaximos: setsCedidosMaximos,
+                            descripcion: `Ganar ${partidosAGanar} partidos consiguiendo ${setsNecesarios} sets`,
+                            detalleSets: `Puede ceder máximo ${setsCedidosMaximos} sets`,
+                            urgencia: setsCedidosMaximos === 0 ? 'alta' : 'media',
+                            enCurso: detallesEnCurso
+                        };
+                    } else {
+                        // Verificar por puntos
+                        const puntosMaxRival = rivalActual.puntos + (partidosRestantes - partidosAGanar) * 33;
+                        const puntosNecesarios = puntosMaxRival + 1 - equipoActual.puntos;
+                        const puntosDisponibles = partidosAGanar * 33;
+                        
+                        if (puntosNecesarios <= puntosDisponibles) {
+                            return {
+                                tipo: 'puntos',
+                                partidosNecesarios: partidosAGanar,
+                                puntosNecesarios: puntosNecesarios,
+                                descripcion: `Ganar ${partidosAGanar} partidos consiguiendo ${puntosNecesarios} puntos`,
+                                detallePuntos: `Debe ganar todos los sets posibles`,
+                                urgencia: 'alta',
+                                enCurso: detallesEnCurso
+                            };
+                        }
+                    }
+                }
+            }
+            
+            return {
+                tipo: 'imposible',
+                descripcion: 'No puede ser campeón matemáticamente',
+                urgencia: 'baja',
+                enCurso: detallesEnCurso
+            };
+        }
+
+        function generarRequisitoHTML(nombreEquipo, requisito, clase) {
+            const urgenciaClass = requisito.urgencia === 'alta' ? 'urgent' : '';
+            
+            let html = `<div class="live-requirement ${urgenciaClass}">`;
+            html += `<h4>🎯 ${nombreEquipo}</h4>`;
+            
+            if (requisito.tipo === 'imposible') {
+                html += `<div class="requirement-detail">❌ ${requisito.descripcion}</div>`;
+            } else {
+                html += `<div class="requirement-detail"><strong>${requisito.descripcion}</strong></div>`;
+                
+                if (requisito.detallePartidos) {
+                    html += `<div class="requirement-detail">${requisito.detallePartidos}</div>`;
+                }
+                
+                if (requisito.detalleSets) {
+                    html += `<div class="requirement-detail">${requisito.detalleSets}</div>`;
+                }
+                
+                if (requisito.detallePuntos) {
+                    html += `<div class="requirement-detail">${requisito.detallePuntos}</div>`;
+                }
+            }
+            
+            // Mostrar estado de partidos en curso
+            if (requisito.enCurso && requisito.enCurso.length > 0) {
+                html += `<div class="requirement-detail"><strong>Partidos en curso:</strong></div>`;
+                requisito.enCurso.forEach(detalle => {
+                    html += `<div class="requirement-detail">• ${detalle}</div>`;
+                });
+            }
+            
+            html += '</div>';
+            return html;
         }
 
         function guardarValoresSet(partidoId, setIndex) {
@@ -1151,6 +1372,7 @@
             inicializarPartidos();
             actualizarResumenFinal();
             actualizarResumenVuelta();
+            actualizarEstadoTiempoReal(); // Inicializar estado en tiempo real
             actualizarEscenarios();
         });
     </script>
