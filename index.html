@@ -86,14 +86,14 @@
             padding: 30px;
         }
 
-        .ida-results {
+        .ida-results, .vuelta-results {
             background: #e8f5e8;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
         }
 
-        .ida-results h3 {
+        .ida-results h3, .vuelta-results h3 {
             color: #28a745;
             margin-bottom: 15px;
             font-size: 1.3rem;
@@ -114,6 +114,13 @@
         .summary-table th {
             background: #28a745;
             color: white;
+        }
+
+        .final-summary {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
 
         .vuelta-section {
@@ -160,7 +167,7 @@
 
         .sets-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
             margin-top: 15px;
         }
@@ -174,14 +181,38 @@
 
         .set-inputs {
             display: flex;
-            gap: 5px;
+            flex-direction: column;
+            gap: 8px;
             justify-content: center;
             align-items: center;
             margin-top: 8px;
         }
 
+        .team-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .team-label {
+            font-weight: bold;
+            min-width: 70px;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        .team-label.cartagena {
+            color: #007bff;
+        }
+
+        .team-label.recreativo {
+            color: #28a745;
+        }
+
         .set-input {
-            width: 40px;
+            width: 45px;
             height: 35px;
             text-align: center;
             border: 2px solid #ddd;
@@ -195,14 +226,12 @@
             border-color: #007bff;
         }
 
-        .set-input:disabled {
-            background: #e9ecef;
-            cursor: not-allowed;
-        }
-
-        .vs-text {
+        .vs-divider {
             font-weight: bold;
             color: #666;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 5px 0;
         }
 
         .champion-section {
@@ -265,13 +294,6 @@
             display: block;
         }
 
-        .final-summary {
-            background: #e9ecef;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
         @keyframes slideIn {
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -296,6 +318,7 @@
             .sets-container { grid-template-columns: 1fr; }
             .partido-header { flex-direction: column; text-align: center; }
             .champion-section h2 { font-size: 2rem; }
+            .team-label { min-width: 60px; font-size: 0.8rem; }
         }
 
         @media (max-width: 480px) {
@@ -314,19 +337,19 @@
 
         <div class="logos">
             <div class="team-logo">
-                <img src="https://liga.badminton.es/wp-content/uploads/2022/09/IES-La-Orden.png" alt="Recreativo IES La Orden">
-                <h3>Recreativo IES La Orden</h3>
+                <img src="https://liga.badminton.es/wp-content/uploads/2022/12/Logo-Puertas-Padilla-Cartagena.png" alt="Puertas Padilla Cartagena">
+                <h3>Puertas Padilla Cartagena</h3>
             </div>
             <div class="vs">VS</div>
             <div class="team-logo">
-                <img src="https://liga.badminton.es/wp-content/uploads/2022/12/Logo-Puertas-Padilla-Cartagena.png" alt="Puertas Padilla Cartagena">
-                <h3>Puertas Padilla Cartagena</h3>
+                <img src="https://liga.badminton.es/wp-content/uploads/2022/09/IES-La-Orden.png" alt="Recreativo IES La Orden">
+                <h3>Recreativo IES La Orden</h3>
             </div>
         </div>
 
         <div class="results-section">
             <div class="ida-results">
-                <h3><i class="fas fa-check-circle"></i> Resultados de Ida</h3>
+                <h3><i class="fas fa-check-circle"></i> Resultados Final-IDA</h3>
                 <table class="summary-table">
                     <thead>
                         <tr>
@@ -353,29 +376,24 @@
                 </table>
             </div>
 
-            <div id="championSection" class="champion-section">
-                <div class="trophy"><i class="fas fa-trophy"></i></div>
-                <h2 id="championName">¡CAMPEÓN!</h2>
-                <p id="championDetails"></p>
-            </div>
-
-            <div class="vuelta-section">
-                <h3><i class="fas fa-play-circle"></i> Partidos de Vuelta</h3>
-                <div id="partidosContainer"></div>
-            </div>
-
-            <div class="scenario-section">
-                <button class="scenario-toggle" onclick="toggleScenarios()">
-                    <span><i class="fas fa-calculator"></i> Escenarios para ser Campeón</span>
-                    <i class="fas fa-chevron-down" id="scenarioIcon"></i>
-                </button>
-                <div id="scenarioContent" class="scenario-content">
-                    <div id="scenarioText"></div>
-                </div>
+            <div class="vuelta-results">
+                <h3><i class="fas fa-check-circle"></i> Resultados Final-VUELTA</h3>
+                <table class="summary-table" id="vueltaSummary">
+                    <thead>
+                        <tr>
+                            <th>Equipo</th>
+                            <th>Partidos Ganados</th>
+                            <th>Sets Ganados</th>
+                            <th>Puntos Ganados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vueltaSummaryBody">
+                    </tbody>
+                </table>
             </div>
 
             <div class="final-summary">
-                <h3><i class="fas fa-chart-bar"></i> Resumen Final</h3>
+                <h3><i class="fas fa-chart-bar"></i> Clasificación Final</h3>
                 <table class="summary-table" id="finalSummary">
                     <thead>
                         <tr>
@@ -388,6 +406,27 @@
                     <tbody id="finalSummaryBody">
                     </tbody>
                 </table>
+            </div>
+
+            <div id="championSection" class="champion-section">
+                <div class="trophy"><i class="fas fa-trophy"></i></div>
+                <h2 id="championName">¡CAMPEÓN!</h2>
+                <p id="championDetails"></p>
+            </div>
+
+            <div class="vuelta-section">
+                <h3><i class="fas fa-play-circle"></i> Encuentro de Vuelta: Puertas Padilla Cartagena vs Recreativo IES La Orden</h3>
+                <div id="partidosContainer"></div>
+            </div>
+
+            <div class="scenario-section">
+                <button class="scenario-toggle" onclick="toggleScenarios()">
+                    <span><i class="fas fa-calculator"></i> Escenarios para ser Campeón</span>
+                    <i class="fas fa-chevron-down" id="scenarioIcon"></i>
+                </button>
+                <div id="scenarioContent" class="scenario-content">
+                    <div id="scenarioText"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -450,20 +489,27 @@
                 <div class="set" id="set-${partidoId}-${setIndex}">
                     <div><strong>Set ${setIndex + 1}</strong></div>
                     <div class="set-inputs">
-                        <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-rec" 
-                               min="0" max="30" placeholder="0"
-                               onchange="actualizarSet('${partidoId}', ${setIndex}, 'rec', this.value)">
-                        <span class="vs-text">-</span>
-                        <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-car" 
-                               min="0" max="30" placeholder="0"
-                               onchange="actualizarSet('${partidoId}', ${setIndex}, 'car', this.value)">
+                        <div class="team-input-row">
+                            <label class="team-label cartagena">Cartagena:</label>
+                            <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-car" 
+                                   min="0" max="30" placeholder="0"
+                                   onchange="actualizarSet('${partidoId}', ${setIndex}, 'car', this.value)">
+                        </div>
+                        <div class="vs-divider">VS</div>
+                        <div class="team-input-row">
+                            <label class="team-label recreativo">Recreativo:</label>
+                            <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-rec" 
+                                   min="0" max="30" placeholder="0"
+                                   onchange="actualizarSet('${partidoId}', ${setIndex}, 'rec', this.value)">
+                        </div>
                     </div>
                 </div>
             `;
         }
 
-        function actualizarSet(partidoId, setIndex, equipo, valor) {[2]
-            if (partidosVuelta[partidoId].finalizado) return;
+        function actualizarSet(partidoId, setIndex, equipo, valor) {
+            // REMOVIDO: if (partidosVuelta[partidoId].finalizado) return;
+            // Ahora permite editar incluso partidos finalizados
             
             valor = parseInt(valor) || 0;
             
@@ -490,54 +536,77 @@
                     partidosVuelta[partidoId].sets[setIndex] = {rec: puntosRec, car: puntosCar};
                 }
                 
-                // Recalcular sets ganados
-                partidosVuelta[partidoId].setsRecreativo = 0;
-                partidosVuelta[partidoId].setsCartagena = 0;
+                // Recalcular todo el partido
+                recalcularPartido(partidoId);
                 
-                partidosVuelta[partidoId].sets.forEach(set => {
-                    if (set.rec > set.car) {
-                        partidosVuelta[partidoId].setsRecreativo++;
-                    } else {
-                        partidosVuelta[partidoId].setsCartagena++;
-                    }
-                });
-                
-                // Actualizar marcador
-                document.getElementById(`marcador-${partidoId}`).textContent = 
-                    `${partidosVuelta[partidoId].setsRecreativo} - ${partidosVuelta[partidoId].setsCartagena}`;
-                
-                // Verificar si el partido ha terminado
-                if (partidosVuelta[partidoId].setsRecreativo === 3 || partidosVuelta[partidoId].setsCartagena === 3) {
-                    partidosVuelta[partidoId].finalizado = true;
-                    document.getElementById(`partido-${partidoId}`).classList.add('finalizado');
-                    
-                    // Deshabilitar inputs restantes
+                // Añadir siguiente set si no existe y el partido no ha terminado
+                const siguienteSet = setIndex + 1;
+                if (!document.getElementById(`set-${partidoId}-${siguienteSet}`) && 
+                    siguienteSet < 5 && 
+                    !partidosVuelta[partidoId].finalizado) {
                     const container = document.getElementById(`sets-${partidoId}`);
-                    const inputs = container.querySelectorAll('.set-input');
-                    inputs.forEach(input => input.disabled = true);
-                } else {
-                    // Añadir siguiente set si no existe
-                    const siguienteSet = setIndex + 1;
-                    if (!document.getElementById(`set-${partidoId}-${siguienteSet}`) && siguienteSet < 5) {
-                        const container = document.getElementById(`sets-${partidoId}`);
-                        container.innerHTML += crearSet(partidoId, siguienteSet);
-                    }
+                    container.innerHTML += crearSet(partidoId, siguienteSet);
                 }
                 
                 actualizarResumenFinal();
+                actualizarResumenVuelta();
+                verificarCampeon();
+                actualizarEscenarios();
+            }
+            
+            // Si se borra un valor, recalcular
+            if (valor === 0) {
+                // Resetear el set si se borra
+                if (partidosVuelta[partidoId].sets[setIndex]) {
+                    partidosVuelta[partidoId].sets[setIndex] = {rec: 0, car: 0};
+                }
+                recalcularPartido(partidoId);
+                actualizarResumenFinal();
+                actualizarResumenVuelta();
                 verificarCampeon();
                 actualizarEscenarios();
             }
         }
 
-        function calcularResultadosFinal() {[3]
+        function recalcularPartido(partidoId) {
+            // Recalcular sets ganados
+            partidosVuelta[partidoId].setsRecreativo = 0;
+            partidosVuelta[partidoId].setsCartagena = 0;
+            
+            partidosVuelta[partidoId].sets.forEach(set => {
+                if (set.rec > set.car) {
+                    partidosVuelta[partidoId].setsRecreativo++;
+                } else if (set.car > set.rec) {
+                    partidosVuelta[partidoId].setsCartagena++;
+                }
+            });
+            
+            // Actualizar marcador
+            document.getElementById(`marcador-${partidoId}`).textContent = 
+                `${partidosVuelta[partidoId].setsCartagena} - ${partidosVuelta[partidoId].setsRecreativo}`;
+            
+            // Verificar si el partido ha terminado
+            const finalizado = partidosVuelta[partidoId].setsRecreativo === 3 || partidosVuelta[partidoId].setsCartagena === 3;
+            partidosVuelta[partidoId].finalizado = finalizado;
+            
+            const partidoElement = document.getElementById(`partido-${partidoId}`);
+            if (finalizado) {
+                partidoElement.classList.add('finalizado');
+            } else {
+                partidoElement.classList.remove('finalizado');
+            }
+            
+            // No deshabilitar inputs - permitir edición siempre
+        }
+
+        function calcularResultadosFinal() {
             let partidosRecreativo = resultadosIda.recreativo.partidos;
             let partidosCartagena = resultadosIda.cartagena.partidos;
             let setsRecreativo = resultadosIda.recreativo.sets;
             let setsCartagena = resultadosIda.cartagena.sets;
             let puntosRecreativo = resultadosIda.recreativo.puntos;
             let puntosCartagena = resultadosIda.cartagena.puntos;
-            
+
             Object.values(partidosVuelta).forEach(partido => {
                 if (partido.finalizado) {
                     if (partido.setsRecreativo > partido.setsCartagena) {
@@ -546,16 +615,52 @@
                         partidosCartagena++;
                     }
                 }
-                
+
                 setsRecreativo += partido.setsRecreativo;
                 setsCartagena += partido.setsCartagena;
-                
+
                 partido.sets.forEach(set => {
-                    puntosRecreativo += set.rec;
-                    puntosCartagena += set.car;
+                    if (set.rec > 0 || set.car > 0) {
+                        puntosRecreativo += set.rec;
+                        puntosCartagena += set.car;
+                    }
                 });
             });
-            
+
+            return {
+                recreativo: { partidos: partidosRecreativo, sets: setsRecreativo, puntos: puntosRecreativo },
+                cartagena: { partidos: partidosCartagena, sets: setsCartagena, puntos: puntosCartagena }
+            };
+        }
+
+        function calcularResultadosVuelta() {
+            let partidosRecreativo = 0;
+            let partidosCartagena = 0;
+            let setsRecreativo = 0;
+            let setsCartagena = 0;
+            let puntosRecreativo = 0;
+            let puntosCartagena = 0;
+
+            Object.values(partidosVuelta).forEach(partido => {
+                if (partido.finalizado) {
+                    if (partido.setsRecreativo > partido.setsCartagena) {
+                        partidosRecreativo++;
+                    } else {
+                        partidosCartagena++;
+                    }
+                }
+
+                setsRecreativo += partido.setsRecreativo;
+                setsCartagena += partido.setsCartagena;
+
+                partido.sets.forEach(set => {
+                    if (set.rec > 0 || set.car > 0) {
+                        puntosRecreativo += set.rec;
+                        puntosCartagena += set.car;
+                    }
+                });
+            });
+
             return {
                 recreativo: { partidos: partidosRecreativo, sets: setsRecreativo, puntos: puntosRecreativo },
                 cartagena: { partidos: partidosCartagena, sets: setsCartagena, puntos: puntosCartagena }
@@ -565,6 +670,26 @@
         function actualizarResumenFinal() {
             const resultados = calcularResultadosFinal();
             const tbody = document.getElementById('finalSummaryBody');
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td><strong>Recreativo IES La Orden</strong></td>
+                    <td>${resultados.recreativo.partidos}</td>
+                    <td>${resultados.recreativo.sets}</td>
+                    <td>${resultados.recreativo.puntos}</td>
+                </tr>
+                <tr>
+                    <td><strong>Puertas Padilla Cartagena</strong></td>
+                    <td>${resultados.cartagena.partidos}</td>
+                    <td>${resultados.cartagena.sets}</td>
+                    <td>${resultados.cartagena.puntos}</td>
+                </tr>
+            `;
+        }
+
+        function actualizarResumenVuelta() {
+            const resultados = calcularResultadosVuelta();
+            const tbody = document.getElementById('vueltaSummaryBody');
             
             tbody.innerHTML = `
                 <tr>
@@ -601,7 +726,7 @@
                 campeon = 'Puertas Padilla Cartagena';
                 razon = `Por partidos ganados: ${resultados.cartagena.partidos} vs máximo posible ${maxPartidosRecreativo}`;
             }
-            // Si hay empate en partidos, verificar por sets (cálculo más complejo)
+            // Si hay empate en partidos, verificar por sets
             else if (resultados.recreativo.partidos === resultados.cartagena.partidos && partidosRestantes === 0) {
                 if (resultados.recreativo.sets > resultados.cartagena.sets) {
                     campeon = 'Recreativo IES La Orden';
@@ -623,6 +748,10 @@
             
             if (campeon) {
                 mostrarCampeon(campeon, razon);
+            } else {
+                // Ocultar sección campeón si no hay campeón claro
+                const section = document.getElementById('championSection');
+                section.classList.remove('show');
             }
         }
 
@@ -647,9 +776,6 @@
             
             if (partidosRestantes > 0) {
                 texto += '<h4>Para ser Campeón:</h4>';
-                
-                const maxPartidosRec = resultados.recreativo.partidos + partidosRestantes;
-                const maxPartidosCard = resultados.cartagena.partidos + partidosRestantes;
                 
                 if (resultados.recreativo.partidos > resultados.cartagena.partidos) {
                     const ventaja = resultados.recreativo.partidos - resultados.cartagena.partidos;
@@ -685,6 +811,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             inicializarPartidos();
             actualizarResumenFinal();
+            actualizarResumenVuelta();
             actualizarEscenarios();
         });
     </script>
