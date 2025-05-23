@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final División de Honor 2025 - Calculadora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS se incluirá en la siguiente sección */
+    </style>
+</head>
+<body>
+    <div id="confetti-container"></div>
+    
+    <header class="main-header">
+        <img src="https://liga.badminton.es/wp-content/uploads/2022/09/LOGO-FESBA.png" alt="FESBA" class="fesba-logo">
+        <h1>FINAL DIVISIÓN DE HONOR 2025</h1>
+        <div class="match-info">
+            <p><strong>Partido de Vuelta:</strong> Sábado, 24 de Mayo de 2025 - 10:00h</p>
+            <p><strong>Lugar:</strong> Pabellón Wssell de Guimbarda, Cartagena</p>
+            <p class="ida-result">Resultado IDA: IES La Orden 1-0 Cartagena (4-3 partidos, 14-10 sets, 225-200 puntos)</p>
+        </div>
+    </header>
+
+    <div class="teams-section">
+        <div class="team">
+            <img src="https://liga.badminton.es/wp-content/uploads/2022/12/Logo-Puertas-Padilla-Cartagena.png" alt="PPC">
+            <h3>Puertas Padilla Cartagena</h3>
+            <div class="team-stats">
+                <div class="stat">
+                    <span class="label">Encuentros:</span>
+                    <span id="ppc-encuentros" class="value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Partidos:</span>
+                    <span id="ppc-partidos" class="value">3</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Sets:</span>
+                    <span id="ppc-sets" class="value">10</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Puntos:</span>
+                    <span id="ppc-puntos" class="value">200</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vs-divider">
+            <div class="global-score">
+                <span id="global-score-text">0 - 1</span>
+                <small>Encuentros Globales</small>
+            </div>
+        </div>
+
+        <div class="team">
+            <img src="https://liga.badminton.es/wp-content/uploads/2022/09/IES-La-Orden.png" alt="IES">
+            <h3>Recreativo IES La Orden</h3>
+            <div class="team-stats">
+                <div class="stat">
+                    <span class="label">Encuentros:</span>
+                    <span id="ies-encuentros" class="value">1</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Partidos:</span>
+                    <span id="ies-partidos" class="value">4</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Sets:</span>
+                    <span id="ies-sets" class="value">14</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Puntos:</span>
+                    <span id="ies-puntos" class="value">225</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="matches-container">
+        <div class="match-card" data-match="DX">
+            <h4>Dobles Mixtos (DX)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="DF">
+            <h4>Dobles Femenino (DF)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="DM">
+            <h4>Dobles Masculino (DM)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="IF2">
+            <h4>Individual Femenino 2 (IF2)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="IM2">
+            <h4>Individual Masculino 2 (IM2)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="IF1">
+            <h4>Individual Femenino 1 (IF1)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+
+        <div class="match-card" data-match="IM1">
+            <h4>Individual Masculino 1 (IM1)</h4>
+            <div class="sets-container">
+                <div class="set-input" data-set="1">
+                    <label>Set 1:</label>
+                    <input type="number" class="ppc-score" min="0" max="30" placeholder="PPC">
+                    <span>-</span>
+                    <input type="number" class="ies-score" min="0" max="30" placeholder="IES">
+                </div>
+            </div>
+            <div class="match-result"></div>
+        </div>
+    </div>
+
+    <div class="champion-banner" id="champion-banner" style="display: none;">
+        <div class="trophy">🏆</div>
+        <h2 id="champion-text"></h2>
+        <p>¡CAMPEÓN DIVISIÓN DE HONOR 2025!</p>
+    </div>
+
+    <div class="scenarios-section">
+        <details>
+            <summary>Análisis de Escenarios</summary>
+            <div id="scenarios-content">
+                <p>Introduce resultados para ver qué necesita cada equipo para ser campeón.</p>
+            </div>
+        </details>
+    </div>
+</body>
+</html>
