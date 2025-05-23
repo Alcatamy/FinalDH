@@ -134,6 +134,22 @@
             color: #856404;
             margin-bottom: 20px;
             font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .vuelta-title-logos {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .vuelta-title-logos img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
         }
 
         .partido {
@@ -165,11 +181,40 @@
             color: #333;
         }
 
+        .partido-content {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .equipos-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .equipo-label {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 35px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .equipo-label.cartagena {
+            color: #007bff;
+        }
+
+        .equipo-label.recreativo {
+            color: #333;
+        }
+
         .sets-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 10px;
-            margin-top: 15px;
         }
 
         .set {
@@ -182,33 +227,8 @@
         .set-inputs {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
+            gap: 10px;
             margin-top: 8px;
-        }
-
-        .team-input-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .team-label {
-            font-weight: bold;
-            min-width: 70px;
-            text-align: right;
-            font-size: 0.9rem;
-        }
-
-        .team-label.cartagena {
-            color: #007bff;
-        }
-
-        .team-label.recreativo {
-            color: #28a745;
         }
 
         .set-input {
@@ -224,14 +244,6 @@
         .set-input:focus {
             outline: none;
             border-color: #007bff;
-        }
-
-        .vs-divider {
-            font-weight: bold;
-            color: #666;
-            font-size: 1.1rem;
-            text-align: center;
-            margin: 5px 0;
         }
 
         .champion-section {
@@ -315,16 +327,17 @@
             .header .subtitle { font-size: 1rem; }
             .team-logo img { width: 60px; height: 60px; }
             .vs { font-size: 1.5rem; }
-            .sets-container { grid-template-columns: 1fr; }
-            .partido-header { flex-direction: column; text-align: center; }
+            .partido-content { grid-template-columns: 120px 1fr; }
+            .equipos-labels { gap: 10px; }
             .champion-section h2 { font-size: 2rem; }
-            .team-label { min-width: 60px; font-size: 0.8rem; }
         }
 
         @media (max-width: 480px) {
             .container { margin: 10px; }
             .header, .results-section { padding: 20px; }
             .logos { padding: 15px; }
+            .partido-content { grid-template-columns: 1fr; }
+            .equipos-labels { flex-direction: row; justify-content: space-around; }
         }
     </style>
 </head>
@@ -415,7 +428,15 @@
             </div>
 
             <div class="vuelta-section">
-                <h3><i class="fas fa-play-circle"></i> Encuentro de Vuelta: Puertas Padilla Cartagena vs Recreativo IES La Orden</h3>
+                <h3>
+                    <i class="fas fa-play-circle"></i> 
+                    <span>Encuentro de Vuelta:</span>
+                    <div class="vuelta-title-logos">
+                        <img src="https://liga.badminton.es/wp-content/uploads/2022/12/Logo-Puertas-Padilla-Cartagena.png" alt="Cartagena">
+                        <span>vs</span>
+                        <img src="https://liga.badminton.es/wp-content/uploads/2022/09/IES-La-Orden.png" alt="IES La Orden">
+                    </div>
+                </h3>
                 <div id="partidosContainer"></div>
             </div>
 
@@ -432,7 +453,7 @@
     </div>
 
     <script>
-        // Resultados de ida[1]
+        // Resultados de ida
         const resultadosIda = {
             recreativo: { partidos: 4, sets: 14, puntos: 225 },
             cartagena: { partidos: 3, sets: 10, puntos: 200 }
@@ -475,8 +496,14 @@
                             <span id="marcador-${partidoId}">0 - 0</span>
                         </div>
                     </div>
-                    <div class="sets-container" id="sets-${partidoId}">
-                        ${crearSet(partidoId, 0)}
+                    <div class="partido-content">
+                        <div class="equipos-labels">
+                            <div class="equipo-label cartagena">Cartagena:</div>
+                            <div class="equipo-label recreativo">IES La Orden:</div>
+                        </div>
+                        <div class="sets-container" id="sets-${partidoId}">
+                            ${crearSet(partidoId, 0)}
+                        </div>
                     </div>
                 `;
                 
@@ -489,28 +516,18 @@
                 <div class="set" id="set-${partidoId}-${setIndex}">
                     <div><strong>Set ${setIndex + 1}</strong></div>
                     <div class="set-inputs">
-                        <div class="team-input-row">
-                            <label class="team-label cartagena">Cartagena:</label>
-                            <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-car" 
-                                   min="0" max="30" placeholder="0"
-                                   onchange="actualizarSet('${partidoId}', ${setIndex}, 'car', this.value)">
-                        </div>
-                        <div class="vs-divider">VS</div>
-                        <div class="team-input-row">
-                            <label class="team-label recreativo">Recreativo:</label>
-                            <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-rec" 
-                                   min="0" max="30" placeholder="0"
-                                   onchange="actualizarSet('${partidoId}', ${setIndex}, 'rec', this.value)">
-                        </div>
+                        <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-car" 
+                               min="0" max="30" placeholder="0"
+                               onchange="actualizarSet('${partidoId}', ${setIndex}, 'car', this.value)">
+                        <input type="number" class="set-input" id="input-${partidoId}-${setIndex}-rec" 
+                               min="0" max="30" placeholder="0"
+                               onchange="actualizarSet('${partidoId}', ${setIndex}, 'rec', this.value)">
                     </div>
                 </div>
             `;
         }
 
         function actualizarSet(partidoId, setIndex, equipo, valor) {
-            // REMOVIDO: if (partidosVuelta[partidoId].finalizado) return;
-            // Ahora permite editar incluso partidos finalizados
-            
             valor = parseInt(valor) || 0;
             
             // Autocompletar si no es 11
@@ -520,6 +537,9 @@
             if (valor !== 11 && valor > 0) {
                 otroInput.value = 11;
             }
+            
+            // Guardar valores actuales antes de cualquier actualización
+            guardarValoresSet(partidoId, setIndex);
             
             // Verificar si el set está completo
             const inputRec = document.getElementById(`input-${partidoId}-${setIndex}-rec`);
@@ -546,6 +566,9 @@
                     !partidosVuelta[partidoId].finalizado) {
                     const container = document.getElementById(`sets-${partidoId}`);
                     container.innerHTML += crearSet(partidoId, siguienteSet);
+                    
+                    // Restaurar todos los valores después de crear el nuevo set
+                    restaurarValoresPartido(partidoId);
                 }
                 
                 actualizarResumenFinal();
@@ -556,7 +579,6 @@
             
             // Si se borra un valor, recalcular
             if (valor === 0) {
-                // Resetear el set si se borra
                 if (partidosVuelta[partidoId].sets[setIndex]) {
                     partidosVuelta[partidoId].sets[setIndex] = {rec: 0, car: 0};
                 }
@@ -566,6 +588,34 @@
                 verificarCampeon();
                 actualizarEscenarios();
             }
+        }
+
+        function guardarValoresSet(partidoId, setIndex) {
+            const inputRec = document.getElementById(`input-${partidoId}-${setIndex}-rec`);
+            const inputCar = document.getElementById(`input-${partidoId}-${setIndex}-car`);
+            
+            if (inputRec && inputCar) {
+                const puntosRec = parseInt(inputRec.value) || 0;
+                const puntosCar = parseInt(inputCar.value) || 0;
+                
+                if (partidosVuelta[partidoId].sets.length <= setIndex) {
+                    partidosVuelta[partidoId].sets.push({rec: puntosRec, car: puntosCar});
+                } else {
+                    partidosVuelta[partidoId].sets[setIndex] = {rec: puntosRec, car: puntosCar};
+                }
+            }
+        }
+
+        function restaurarValoresPartido(partidoId) {
+            partidosVuelta[partidoId].sets.forEach((set, idx) => {
+                const inputRec = document.getElementById(`input-${partidoId}-${idx}-rec`);
+                const inputCar = document.getElementById(`input-${partidoId}-${idx}-car`);
+                
+                if (inputRec && inputCar) {
+                    inputRec.value = set.rec || 0;
+                    inputCar.value = set.car || 0;
+                }
+            });
         }
 
         function recalcularPartido(partidoId) {
@@ -595,8 +645,6 @@
             } else {
                 partidoElement.classList.remove('finalizado');
             }
-            
-            // No deshabilitar inputs - permitir edición siempre
         }
 
         function calcularResultadosFinal() {
@@ -770,24 +818,46 @@
             const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
             
             let texto = '<h4>Situación Actual:</h4>';
-            texto += `<p><strong>Recreativo:</strong> ${resultados.recreativo.partidos} partidos, ${resultados.recreativo.sets} sets, ${resultados.recreativo.puntos} puntos</p>`;
+            texto += `<p><strong>IES La Orden:</strong> ${resultados.recreativo.partidos} partidos, ${resultados.recreativo.sets} sets, ${resultados.recreativo.puntos} puntos</p>`;
             texto += `<p><strong>Cartagena:</strong> ${resultados.cartagena.partidos} partidos, ${resultados.cartagena.sets} sets, ${resultados.cartagena.puntos} puntos</p>`;
             texto += `<p><strong>Partidos restantes:</strong> ${partidosRestantes}</p>`;
             
             if (partidosRestantes > 0) {
-                texto += '<h4>Para ser Campeón:</h4>';
+                texto += '<h4>Para ser Campeón (mínimo necesario):</h4>';
                 
-                if (resultados.recreativo.partidos > resultados.cartagena.partidos) {
-                    const ventaja = resultados.recreativo.partidos - resultados.cartagena.partidos;
-                    texto += `<p><strong>Recreativo</strong> necesita ganar ${Math.max(0, partidosRestantes - ventaja + 1)} de los ${partidosRestantes} partidos restantes</p>`;
-                    texto += `<p><strong>Cartagena</strong> debe ganar ${Math.min(partidosRestantes, ventaja + 1)} de los ${partidosRestantes} partidos restantes</p>`;
-                } else if (resultados.cartagena.partidos > resultados.recreativo.partidos) {
-                    const ventaja = resultados.cartagena.partidos - resultados.recreativo.partidos;
-                    texto += `<p><strong>Cartagena</strong> necesita ganar ${Math.max(0, partidosRestantes - ventaja + 1)} de los ${partidosRestantes} partidos restantes</p>`;
-                    texto += `<p><strong>Recreativo</strong> debe ganar ${Math.min(partidosRestantes, ventaja + 1)} de los ${partidosRestantes} partidos restantes</p>`;
+                // Calcular lo mínimo que necesita cada equipo para ganar
+                // Para IES La Orden
+                const minPartidosNecesariosIES = Math.max(0, resultados.cartagena.partidos + 1 - resultados.recreativo.partidos);
+                const partidosRestantesParaIES = Math.min(minPartidosNecesariosIES, partidosRestantes);
+                
+                // Para Cartagena  
+                const minPartidosNecesariosCartagena = Math.max(0, resultados.recreativo.partidos + 1 - resultados.cartagena.partidos);
+                const partidosRestantesParaCartagena = Math.min(minPartidosNecesariosCartagena, partidosRestantes);
+                
+                if (partidosRestantesParaIES <= partidosRestantes) {
+                    texto += `<p><strong>IES La Orden</strong> necesita ganar al menos <strong>${partidosRestantesParaIES}</strong> de los ${partidosRestantes} partidos restantes para ser campeón por partidos</p>`;
                 } else {
-                    texto += `<p>Empate en partidos. El que gane más partidos de los ${partidosRestantes} restantes será campeón</p>`;
-                    texto += `<p>Si siguen empatados, se decidirá por sets ganados y luego por puntos</p>`;
+                    texto += `<p><strong>IES La Orden</strong> no puede ganar por partidos (necesitaría ${minPartidosNecesariosIES} pero solo quedan ${partidosRestantes})</p>`;
+                }
+                
+                if (partidosRestantesParaCartagena <= partidosRestantes) {
+                    texto += `<p><strong>Cartagena</strong> necesita ganar al menos <strong>${partidosRestantesParaCartagena}</strong> de los ${partidosRestantes} partidos restantes para ser campeón por partidos</p>`;
+                } else {
+                    texto += `<p><strong>Cartagena</strong> no puede ganar por partidos (necesitaría ${minPartidosNecesariosCartagena} pero solo quedan ${partidosRestantes})</p>`;
+                }
+                
+                if (partidosRestantesParaIES > partidosRestantes && partidosRestantesParaCartagena > partidosRestantes) {
+                    texto += `<p><strong>Empate en partidos garantizado.</strong> Se decidirá por sets ganados y luego por puntos</p>`;
+                    
+                    // Calcular diferencia actual en sets
+                    const diferenciaeSets = resultados.recreativo.sets - resultados.cartagena.sets;
+                    if (diferenciaeSets > 0) {
+                        texto += `<p>IES La Orden lleva ventaja de ${diferenciaeSets} sets</p>`;
+                    } else if (diferenciaeSets < 0) {
+                        texto += `<p>Cartagena lleva ventaja de ${Math.abs(diferenciaeSets)} sets</p>`;
+                    } else {
+                        texto += `<p>Empate en sets. Se decidirá por puntos ganados</p>`;
+                    }
                 }
             }
             
