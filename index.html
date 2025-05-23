@@ -787,76 +787,100 @@
 
         function calcularCampeonMatematico(resultados, partidosRestantes) {
             let escenarios = {
-                recreativo: { minPartidos: partidosRestantes + 1, minSets: 0, minPuntos: 0 },
-                cartagena: { minPartidos: partidosRestantes + 1, minSets: 0, minPuntos: 0 }
+                recreativo: { minPartidos: partidosRestantes + 1, minSetsNecesariosEnEsosPartidos: 0, minPuntosNecesariosEnEsosSets: 0, motivo: "" },
+                cartagena: { minPartidos: partidosRestantes + 1, minSetsNecesariosEnEsosPartidos: 0, minPuntosNecesariosEnEsosSets: 0, motivo: "" }
             };
-            
-            // Para cada número de partidos que puede ganar cada equipo
-            for (let partidosGanados = 0; partidosGanados <= partidosRestantes; partidosGanados++) {
-                
-                // ANÁLISIS PARA RECREATIVO
-                const partidosFinalesRec = resultados.recreativo.partidos + partidosGanados;
-                const partidosFinalesCar = resultados.cartagena.partidos + (partidosRestantes - partidosGanados);
-                
-                if (partidosFinalesRec > partidosFinalesCar) {
-                    // Gana por partidos automáticamente
-                    if (partidosGanados < escenarios.recreativo.minPartidos) {
-                        escenarios.recreativo = { minPartidos: partidosGanados, minSets: 0, minPuntos: 0 };
-                    }
-                } else if (partidosFinalesRec === partidosFinalesCar) {
-                    // Empate en partidos, necesita ganar por sets o puntos
-                    const setsMaxCartagena = resultados.cartagena.sets + (partidosRestantes - partidosGanados) * 3;
-                    const setsNecesarios = Math.max(0, setsMaxCartagena + 1 - resultados.recreativo.sets);
-                    
-                    if (setsNecesarios <= partidosGanados * 3) {
-                        // Puede ganar por sets
-                        if (partidosGanados < escenarios.recreativo.minPartidos) {
-                            escenarios.recreativo = { minPartidos: partidosGanados, minSets: setsNecesarios, minPuntos: 0 };
+        
+            for (let equipo of ['recreativo', 'cartagena']) {
+                const equipoActual = equipo === 'recreativo' ? resultados.recreativo : resultados.cartagena;
+                const rivalActual = equipo === 'recreativo' ? resultados.cartagena : resultados.recreativo;
+        
+                for (let partidosGanadosPorEquipo = 0; partidosGanadosPorEquipo <= partidosRestantes; partidosGanadosPorEquipo++) {
+                    const partidosGanadosPorRival = partidosRestantes - partidosGanadosPorEquipo;
+        
+                    const partidosFinalesEquipo = equipoActual.partidos + partidosGanadosPorEquipo;
+                    const partidosFinalesRival = rivalActual.partidos + partidosGanadosPorRival;
+        
+                    if (partidosFinalesEquipo > partidosFinalesRival) {
+                        if (partidosGanadosPorEquipo < escenarios[equipo].minPartidos) {
+                            escenarios[equipo] = { minPartidos: partidosGanadosPorEquipo, minSetsNecesariosEnEsosPartidos: 0, minPuntosNecesariosEnEsosSets: 0, motivo: "Gana por cómputo de partidos." };
                         }
-                    } else {
-                        // Necesita ganar por puntos
-                        const puntosMaxCartagena = resultados.cartagena.puntos + (partidosRestantes - partidosGanados) * 33; // 3 sets × 11 puntos
-                        const puntosNecesarios = Math.max(0, puntosMaxCartagena + 1 - resultados.recreativo.puntos);
-                        
-                        if (puntosNecesarios <= partidosGanados * 33) {
-                            if (partidosGanados < escenarios.recreativo.minPartidos) {
-                                escenarios.recreativo = { minPartidos: partidosGanados, minSets: partidosGanados * 3, minPuntos: puntosNecesarios };
+                    } else if (partidosFinalesEquipo === partidosFinalesRival) {
+                        // Empate en partidos, verificar sets
+                        // Máximo de sets que el rival podría tener
+                        const setsMaxRival = rivalActual.sets + partidosGanadosPorRival * 3;
+                        // Sets que el equipo necesita ganar EN LOS PARTIDOS QUE GANA para superar al rival
+                        const setsAdicionalesNecesarios = Math.max(0, (setsMaxRival + 1) - equipoActual.sets);
+        
+                        if (setsAdicionalesNecesarios <= partidosGanadosPorEquipo * 3) { // Es posible obtener esos sets
+                            if (partidosGanadosPorEquipo < escenarios[equipo].minPartidos || (partidosGanadosPorEquipo === escenarios[equipo].minPartidos && setsAdicionalesNecesarios < escenarios[equipo].minSetsNecesariosEnEsosPartidos) ) {
+                                escenarios[equipo] = { minPartidos: partidosGanadosPorEquipo, minSetsNecesariosEnEsosPartidos: setsAdicionalesNecesarios, minPuntosNecesariosEnEsosSets: 0, motivo: "Gana por desempate de sets." };
                             }
-                        }
-                    }
-                }
-                
-                // ANÁLISIS PARA CARTAGENA (similar pero invertido)
-                const partidosFinalesCarInv = resultados.cartagena.partidos + partidosGanados;
-                const partidosFinalesRecInv = resultados.recreativo.partidos + (partidosRestantes - partidosGanados);
-                
-                if (partidosFinalesCarInv > partidosFinalesRecInv) {
-                    if (partidosGanados < escenarios.cartagena.minPartidos) {
-                        escenarios.cartagena = { minPartidos: partidosGanados, minSets: 0, minPuntos: 0 };
-                    }
-                } else if (partidosFinalesCarInv === partidosFinalesRecInv) {
-                    const setsMaxRecreativos = resultados.recreativo.sets + (partidosRestantes - partidosGanados) * 3;
-                    const setsNecesarios = Math.max(0, setsMaxRecreativos + 1 - resultados.cartagena.sets);
-                    
-                    if (setsNecesarios <= partidosGanados * 3) {
-                        if (partidosGanados < escenarios.cartagena.minPartidos) {
-                            escenarios.cartagena = { minPartidos: partidosGanados, minSets: setsNecesarios, minPuntos: 0 };
-                        }
-                    } else {
-                        const puntosMaxRecreativos = resultados.recreativo.puntos + (partidosRestantes - partidosGanados) * 33;
-                        const puntosNecesarios = Math.max(0, puntosMaxRecreativos + 1 - resultados.cartagena.puntos);
-                        
-                        if (puntosNecesarios <= partidosGanados * 33) {
-                            if (partidosGanados < escenarios.cartagena.minPartidos) {
-                                escenarios.cartagena = { minPartidos: partidosGanados, minSets: partidosGanados * 3, minPuntos: puntosNecesarios };
+                        } else {
+                            // No puede ganar por sets, verificar puntos
+                            // Asumimos que el equipo gana todos los sets en los partidos que gana (partidosGanadosPorEquipo * 3)
+                            const setsEquipoConPartidosGanados = equipoActual.sets + partidosGanadosPorEquipo * 3;
+                            // Si aun así los sets del equipo no superan los setsMaxRival, entonces hay que ir a puntos.
+                            // Esto sucede si setsEquipoConPartidosGanados === setsMaxRival
+        
+                            if (setsEquipoConPartidosGanados === setsMaxRival) {
+                                const puntosMaxRival = rivalActual.puntos + partidosGanadosPorRival * 3 * 11; // Máximos puntos del rival
+                                const puntosAdicionalesNecesarios = Math.max(0, (puntosMaxRival + 1) - equipoActual.puntos);
+        
+                                // Puntos que el equipo puede obtener en los sets que gana (partidosGanadosPorEquipo * 3 sets * 11 puntos)
+                                if (puntosAdicionalesNecesarios <= partidosGanadosPorEquipo * 3 * 11) {
+                                    if (partidosGanadosPorEquipo < escenarios[equipo].minPartidos || 
+                                        (partidosGanadosPorEquipo === escenarios[equipo].minPartidos && 
+                                         (partidosGanadosPorEquipo * 3) < escenarios[equipo].minSetsNecesariosEnEsosPartidos ) || // Priorizar menos sets si los partidos son iguales
+                                        (partidosGanadosPorEquipo === escenarios[equipo].minPartidos && 
+                                         (partidosGanadosPorEquipo * 3) === escenarios[equipo].minSetsNecesariosEnEsosPartidos &&
+                                         puntosAdicionalesNecesarios < escenarios[equipo].minPuntosNecesariosEnEsosSets)
+                                        ) {
+                                        escenarios[equipo] = { 
+                                            minPartidos: partidosGanadosPorEquipo, 
+                                            minSetsNecesariosEnEsosPartidos: partidosGanadosPorEquipo * 3, // Debe ganar todos los sets en sus partidos
+                                            minPuntosNecesariosEnEsosSets: puntosAdicionalesNecesarios,
+                                            motivo: "Gana por desempate de puntos." 
+                                        };
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-            
             return escenarios;
         }
+
+        function formatScenario(equipoNombre, escenario, partidosRestantes) {
+            let texto = "";
+            if (escenario.minPartidos <= partidosRestantes) {
+                texto += `<p><strong>Ganar ${escenario.minPartidos} partidos</strong>`;
+                if (escenario.motivo === "Gana por desempate de sets.") {
+                    // Si minSetsNecesariosEnEsosPartidos es 0, significa que ganar los partidos ya es suficiente
+                    // porque los sets actuales del equipo + los sets de esos partidos (min X*3) ya superan al rival.
+                    // O si minSetsNecesariosEnEsosPartidos es > 0, indica cuántos sets debe ganar en esos partidos.
+                    const setsMinimosDePartidosGanados = escenario.minPartidos * 3;
+                    if (escenario.minSetsNecesariosEnEsosPartidos > 0 && escenario.minSetsNecesariosEnEsosPartidos > setsMinimosDePartidosGanados) {
+                         // Este caso es más complejo, implicaría ganar ciertos partidos por más sets que otros.
+                         // Por simplicidad, si ganar los partidos con 3 sets cada uno no basta, se indica.
+                         // Pero la lógica de calcularCampeonMatematico ya busca el escenario óptimo.
+                         // El minSetsNecesariosEnEsosPartidos es el # de sets a ganar en esos partidos.
+                        texto += `, asegurando ganar ${escenario.minSetsNecesariosEnEsosPartidos} sets en esos ${escenario.minPartidos} partidos.`;
+                    }
+                    texto += ` <i>(${escenario.motivo})</i>`;
+                } else if (escenario.motivo === "Gana por desempate de puntos.") {
+                    texto += `, ganando todos los ${escenario.minPartidos * 3} sets en ellos, y consiguiendo ${escenario.minPuntosNecesariosEnEsosSets} puntos en esos sets. <i>(${escenario.motivo})</i>`;
+                } else {
+                    texto += `. <i>(${escenario.motivo})</i>`;
+                }
+                texto += '</p>';
+            } else {
+                texto += '<p><strong>No puede ser campeón matemático</strong> con los partidos restantes.</p>';
+            }
+            return texto;
+        }
+
 
         function actualizarEscenarios() {
             const resultados = calcularResultadosFinal();
@@ -867,99 +891,80 @@
             texto += `<p><strong>Cartagena:</strong> ${resultados.cartagena.partidos} partidos, ${resultados.cartagena.sets} sets, ${resultados.cartagena.puntos} puntos</p>`;
             texto += `<p><strong>Partidos restantes:</strong> ${partidosRestantes}</p>`;
             
-            if (partidosRestantes > 0) {
+            if (partidosRestantes >= 0) { // Cambiado a >=0 para que muestre algo incluso si no quedan partidos
                 const escenarios = calcularCampeonMatematico(resultados, partidosRestantes);
                 
                 texto += '<div class="scenario-item recreativo">';
                 texto += '<h5><i class="fas fa-target"></i> IES La Orden - Campeón matemático mínimo:</h5>';
                 texto += '<div class="min-requirements recreativo">';
-                
-                if (escenarios.recreativo.minPartidos <= partidosRestantes) {
-                    texto += `<p><strong>Ganar ${escenarios.recreativo.minPartidos} partidos</strong>`;
-                    if (escenarios.recreativo.minSets > 0) {
-                        texto += ` + conseguir ${escenarios.recreativo.minSets} sets`;
-                    }
-                    if (escenarios.recreativo.minPuntos > 0) {
-                        texto += ` + conseguir ${escenarios.recreativo.minPuntos} puntos`;
-                    }
-                    texto += '</p>';
-                } else {
-                    texto += '<p><strong>No puede ser campeón matemático</strong></p>';
-                }
-                
+                texto += formatScenario("IES La Orden", escenarios.recreativo, partidosRestantes);
                 texto += '</div></div>';
                 
                 texto += '<div class="scenario-item">';
                 texto += '<h5><i class="fas fa-target"></i> Cartagena - Campeón matemático mínimo:</h5>';
                 texto += '<div class="min-requirements">';
-                
-                if (escenarios.cartagena.minPartidos <= partidosRestantes) {
-                    texto += `<p><strong>Ganar ${escenarios.cartagena.minPartidos} partidos</strong>`;
-                    if (escenarios.cartagena.minSets > 0) {
-                        texto += ` + conseguir ${escenarios.cartagena.minSets} sets`;
-                    }
-                    if (escenarios.cartagena.minPuntos > 0) {
-                        texto += ` + conseguir ${escenarios.cartagena.minPuntos} puntos`;
-                    }
-                    texto += '</p>';
-                } else {
-                    texto += '<p><strong>No puede ser campeón matemático</strong></p>';
-                }
-                
+                texto += formatScenario("Cartagena", escenarios.cartagena, partidosRestantes);
                 texto += '</div></div>';
             }
             
             document.getElementById('scenarioText').innerHTML = texto;
         }
 
+
         function verificarCampeon() {
             const resultados = calcularResultadosFinal();
             const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
             
-            // Calcular máximos posibles para cada equipo
-            const maxPartidosRecreativo = resultados.recreativo.partidos + partidosRestantes;
-            const maxPartidosCartagena = resultados.cartagena.partidos + partidosRestantes;
-            
             let campeon = null;
             let razon = '';
             
-            // Verificar por partidos ganados
-            if (resultados.recreativo.partidos > maxPartidosCartagena) {
-                campeon = 'Recreativo IES La Orden';
-                razon = `Por partidos ganados: ${resultados.recreativo.partidos} vs máximo posible ${maxPartidosCartagena}`;
-            } else if (resultados.cartagena.partidos > maxPartidosRecreativo) {
-                campeon = 'Puertas Padilla Cartagena';
-                razon = `Por partidos ganados: ${resultados.cartagena.partidos} vs máximo posible ${maxPartidosRecreativo}`;
-            }
-            // Si hay empate en partidos, verificar por sets
-            else if (resultados.recreativo.partidos === resultados.cartagena.partidos && partidosRestantes === 0) {
-                if (resultados.recreativo.sets > resultados.cartagena.sets) {
+            const escenarios = calcularCampeonMatematico(resultados, partidosRestantes);
+
+            if (escenarios.recreativo.minPartidos === 0 && partidosRestantes > 0) { // Si Recreativo ya es campeón matemático sin jugar más
+                 campeon = 'Recreativo IES La Orden';
+                 razon = `Campeón matemático: No necesita ganar más partidos. ${escenarios.recreativo.motivo || ''}`;
+            } else if (escenarios.cartagena.minPartidos === 0 && partidosRestantes > 0) { // Si Cartagena ya es campeón matemático sin jugar más
+                 campeon = 'Puertas Padilla Cartagena';
+                 razon = `Campeón matemático: No necesita ganar más partidos. ${escenarios.cartagena.motivo || ''}`;
+            } else if (partidosRestantes === 0) { // Todos los partidos jugados
+                if (resultados.recreativo.partidos > resultados.cartagena.partidos) {
                     campeon = 'Recreativo IES La Orden';
-                    razon = `Por sets ganados: ${resultados.recreativo.sets} vs ${resultados.cartagena.sets}`;
-                } else if (resultados.cartagena.sets > resultados.recreativo.sets) {
+                    razon = `Por partidos ganados: ${resultados.recreativo.partidos} vs ${resultados.cartagena.partidos}`;
+                } else if (resultados.cartagena.partidos > resultados.recreativo.partidos) {
                     campeon = 'Puertas Padilla Cartagena';
-                    razon = `Por sets ganados: ${resultados.cartagena.sets} vs ${resultados.recreativo.sets}`;
-                } else {
-                    // Empate en sets, decidir por puntos
-                    if (resultados.recreativo.puntos > resultados.cartagena.puntos) {
+                    razon = `Por partidos ganados: ${resultados.cartagena.partidos} vs ${resultados.recreativo.partidos}`;
+                } else { // Empate en partidos
+                    if (resultados.recreativo.sets > resultados.cartagena.sets) {
                         campeon = 'Recreativo IES La Orden';
-                        razon = `Por puntos ganados: ${resultados.recreativo.puntos} vs ${resultados.cartagena.puntos}`;
-                    } else {
+                        razon = `Empate en partidos, gana por sets: ${resultados.recreativo.sets} vs ${resultados.cartagena.sets}`;
+                    } else if (resultados.cartagena.sets > resultados.recreativo.sets) {
                         campeon = 'Puertas Padilla Cartagena';
-                        razon = `Por puntos ganados: ${resultados.cartagena.puntos} vs ${resultados.recreativo.puntos}`;
+                        razon = `Empate en partidos, gana por sets: ${resultados.cartagena.sets} vs ${resultados.recreativo.sets}`;
+                    } else { // Empate en sets
+                        if (resultados.recreativo.puntos > resultados.cartagena.puntos) {
+                            campeon = 'Recreativo IES La Orden';
+                            razon = `Empate en partidos y sets, gana por puntos: ${resultados.recreativo.puntos} vs ${resultados.cartagena.puntos}`;
+                        } else if (resultados.cartagena.puntos > resultados.recreativo.puntos) {
+                            campeon = 'Puertas Padilla Cartagena';
+                            razon = `Empate en partidos y sets, gana por puntos: ${resultados.cartagena.puntos} vs ${resultados.recreativo.puntos}`;
+                        } else {
+                            campeon = 'Empate Absoluto'; // Caso muy improbable
+                            razon = 'Empate en partidos, sets y puntos.';
+                        }
                     }
                 }
             }
             
             const banner = document.getElementById('championBanner');
-            if (campeon) {
+            if (campeon && campeon !== 'Empate Absoluto') {
                 mostrarCampeon(campeon, razon);
-                banner.innerHTML = `<i class="fas fa-trophy"></i> ¡CAMPEÓN MATEMÁTICO: ${campeon}!`;
+                banner.innerHTML = `<i class="fas fa-trophy"></i> ¡CAMPEÓN: ${campeon}!`;
                 banner.style.display = 'block';
                 
-                // Scroll automático al banner si no es visible
                 setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (document.body.scrollTop > 0 || document.documentElement.scrollTop > 0) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
                 }, 100);
             } else {
                 const section = document.getElementById('championSection');
@@ -990,61 +995,76 @@
                 if (partido.finalizado) {
                     if (partido.setsRecreativo > partido.setsCartagena) {
                         partidosRecreativo++;
-                    } else {
+                    } else if (partido.setsCartagena > partido.setsRecreativo) { // Añadido else if para no sumar si empatan en sets (aunque no debería pasar en un partido)
                         partidosCartagena++;
                     }
                 }
 
-                setsRecreativo += partido.setsRecreativo;
-                setsCartagena += partido.setsCartagena;
-
-                partido.sets.forEach(set => {
-                    if (set.rec > 0 || set.car > 0) {
-                        puntosRecreativo += set.rec;
-                        puntosCartagena += set.car;
+                partido.sets.forEach(set => { // Contar todos los sets jugados para el total, no solo de partidos finalizados
+                    if (set.rec > set.car) {
+                        setsRecreativo++;
+                    } else if (set.car > set.rec) {
+                        setsCartagena++;
                     }
+                    puntosRecreativo += set.rec;
+                    puntosCartagena += set.car;
                 });
             });
 
+            // Recalcular sets globales basados en los sets ganados por partido en partidosVuelta, sumados a los de ida
+            let setsGlobalesRec = resultadosIda.recreativo.sets;
+            let setsGlobalesCar = resultadosIda.cartagena.sets;
+            let puntosGlobalesRec = resultadosIda.recreativo.puntos;
+            let puntosGlobalesCar = resultadosIda.cartagena.puntos;
+
+            Object.values(partidosVuelta).forEach(partido => {
+                setsGlobalesRec += partido.setsRecreativo;
+                setsGlobalesCar += partido.setsCartagena;
+                partido.sets.forEach(set => {
+                    puntosGlobalesRec += set.rec; // Los puntos de ida ya están, aquí solo los de vuelta
+                    puntosGlobalesCar += set.car;
+                });
+            });
+             // La lógica anterior de sumar sets y puntos de la vuelta estaba bien.
+             // Lo que se devuelve es el GLOBAL.
             return {
-                recreativo: { partidos: partidosRecreativo, sets: setsRecreativo, puntos: puntosRecreativo },
-                cartagena: { partidos: partidosCartagena, sets: setsCartagena, puntos: puntosCartagena }
+                recreativo: { partidos: partidosRecreativo, sets: setsGlobalesRec, puntos: puntosGlobalesRec },
+                cartagena: { partidos: partidosCartagena, sets: setsGlobalesCar, puntos: puntosGlobalesCar }
             };
         }
 
+
         function calcularResultadosVuelta() {
-            let partidosRecreativo = 0;
-            let partidosCartagena = 0;
-            let setsRecreativo = 0;
-            let setsCartagena = 0;
-            let puntosRecreativo = 0;
-            let puntosCartagena = 0;
+            let partidosRecreativoVuelta = 0;
+            let partidosCartagenaVuelta = 0;
+            let setsRecreativoVuelta = 0;
+            let setsCartagenaVuelta = 0;
+            let puntosRecreativoVuelta = 0;
+            let puntosCartagenaVuelta = 0;
 
             Object.values(partidosVuelta).forEach(partido => {
                 if (partido.finalizado) {
                     if (partido.setsRecreativo > partido.setsCartagena) {
-                        partidosRecreativo++;
-                    } else {
-                        partidosCartagena++;
+                        partidosRecreativoVuelta++;
+                    } else if (partido.setsCartagena > partido.setsRecreativo) {
+                        partidosCartagenaVuelta++;
                     }
                 }
-
-                setsRecreativo += partido.setsRecreativo;
-                setsCartagena += partido.setsCartagena;
+                setsRecreativoVuelta += partido.setsRecreativo;
+                setsCartagenaVuelta += partido.setsCartagena;
 
                 partido.sets.forEach(set => {
-                    if (set.rec > 0 || set.car > 0) {
-                        puntosRecreativo += set.rec;
-                        puntosCartagena += set.car;
-                    }
+                    puntosRecreativoVuelta += set.rec;
+                    puntosCartagenaVuelta += set.car;
                 });
             });
 
             return {
-                recreativo: { partidos: partidosRecreativo, sets: setsRecreativo, puntos: puntosRecreativo },
-                cartagena: { partidos: partidosCartagena, sets: setsCartagena, puntos: puntosCartagena }
+                recreativo: { partidos: partidosRecreativoVuelta, sets: setsRecreativoVuelta, puntos: puntosRecreativoVuelta },
+                cartagena: { partidos: partidosCartagenaVuelta, sets: setsCartagenaVuelta, puntos: puntosCartagenaVuelta }
             };
         }
+
 
         function actualizarResumenFinal() {
             const resultados = calcularResultadosFinal();
