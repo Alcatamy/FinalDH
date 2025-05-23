@@ -794,66 +794,82 @@
             }
         }
 
-        // FUNCIÓN CORREGIDA: Considera el PEOR escenario posible para el equipo
         function calcularCampeonMatematico(resultados, partidosRestantes) {
             let escenarios = {
-                recreativo: { minPartidos: partidosRestantes + 1, motivo: "", detalleEscenario: "" },
-                cartagena: { minPartidos: partidosRestantes + 1, motivo: "", detalleEscenario: "" }
+                recreativo: { minPartidos: partidosRestantes + 1, condicion: "", detalle: "" },
+                cartagena: { minPartidos: partidosRestantes + 1, condicion: "", detalle: "" }
             };
             
             for (let equipo of ['recreativo', 'cartagena']) {
                 const equipoActual = equipo === 'recreativo' ? resultados.recreativo : resultados.cartagena;
                 const rivalActual = equipo === 'recreativo' ? resultados.cartagena : resultados.recreativo;
                 
+                // Probar desde 0 partidos hasta todos los restantes
                 for (let partidosGanadosPorEquipo = 0; partidosGanadosPorEquipo <= partidosRestantes; partidosGanadosPorEquipo++) {
                     const partidosGanadosPorRival = partidosRestantes - partidosGanadosPorEquipo;
                     
-                    // ESCENARIO PESIMISTA PARA EL EQUIPO:
-                    // - Gana sus partidos 3-2 (cede 2 sets por partido)
-                    // - Gana cada set 11-10 (cede 10 puntos por set ganado + 22 puntos por los 2 sets perdidos)
                     const partidosFinalesEquipo = equipoActual.partidos + partidosGanadosPorEquipo;
-                    const setsGanadosEquipo = partidosGanadosPorEquipo * 3; // Sets que gana
-                    const setsCedidosEquipo = partidosGanadosPorEquipo * 2; // Sets que cede al ganar 3-2
-                    const setsFinalesEquipo = equipoActual.sets + setsGanadosEquipo;
-                    
-                    // Puntos en el peor escenario para el equipo:
-                    // - 3 sets ganados 11-10 = 3*11 + 3*10 = 63 puntos por partido
-                    // - 2 sets perdidos 10-11 = 2*10 + 2*11 = 42 puntos por partido
-                    // Total: 105 puntos por partido ganado en el peor escenario
-                    const puntosFinalesEquipo = equipoActual.puntos + (partidosGanadosPorEquipo * 105);
-                    
-                    // ESCENARIO OPTIMISTA PARA EL RIVAL:
-                    // - Gana sus partidos 3-0 (no cede sets)
-                    // - Gana cada set 11-0 (no cede puntos)
                     const partidosFinalesRival = rivalActual.partidos + partidosGanadosPorRival;
-                    const setsFinalesRival = rivalActual.sets + setsCedidosEquipo + (partidosGanadosPorRival * 3);
-                    const puntosFinalesRival = rivalActual.puntos + (partidosGanadosPorEquipo * 42) + (partidosGanadosPorRival * 33);
-                    
-                    // Verificar quién gana en este escenario
-                    let equipoGana = false;
-                    let motivoVictoria = '';
                     
                     if (partidosFinalesEquipo > partidosFinalesRival) {
-                        equipoGana = true;
-                        motivoVictoria = 'por partidos';
-                    } else if (partidosFinalesEquipo === partidosFinalesRival) {
-                        if (setsFinalesEquipo > setsFinalesRival) {
-                            equipoGana = true;
-                            motivoVictoria = 'por sets (en empate de partidos)';
-                        } else if (setsFinalesEquipo === setsFinalesRival) {
-                            if (puntosFinalesEquipo > puntosFinalesRival) {
-                                equipoGana = true;
-                                motivoVictoria = 'por puntos (en empate de partidos y sets)';
-                            }
-                        }
-                    }
-                    
-                    if (equipoGana && partidosGanadosPorEquipo < escenarios[equipo].minPartidos) {
+                        // Gana automáticamente por partidos
                         escenarios[equipo] = {
                             minPartidos: partidosGanadosPorEquipo,
-                            motivo: motivoVictoria,
-                            detalleEscenario: `Incluso ganando cada partido 3-2 (11-10 por set), contra rival que gane ${partidosGanadosPorRival} partidos 3-0 (11-0 por set)`
+                            condicion: "Gana automáticamente por partidos",
+                            detalle: `${partidosFinalesEquipo} vs ${partidosFinalesRival} partidos`
                         };
+                        break; // Ya encontramos la opción mínima
+                        
+                    } else if (partidosFinalesEquipo === partidosFinalesRival) {
+                        // Empate en partidos, necesita ganar por sets o puntos
+                        
+                        // Calcular sets máximos del rival
+                        const setsMaxRival = rivalActual.sets + (partidosGanadosPorRival * 3);
+                        // Sets que necesita el equipo para superar al rival
+                        const setsNecesariosParaGanar = setsMaxRival + 1 - equipoActual.sets;
+                        // Sets máximos que puede conseguir ganando sus partidos
+                        const setsMaxEquipo = partidosGanadosPorEquipo * 3;
+                        
+                        if (setsNecesariosParaGanar <= setsMaxEquipo) {
+                            // Puede ganar por sets
+                            if (setsNecesariosParaGanar <= 0) {
+                                // Ya tiene suficientes sets
+                                escenarios[equipo] = {
+                                    minPartidos: partidosGanadosPorEquipo,
+                                    condicion: "Ya tiene ventaja en sets",
+                                    detalle: `Sets actuales: ${equipoActual.sets} vs máximo rival: ${setsMaxRival}`
+                                };
+                            } else {
+                                // Necesita ganar sets específicos
+                                const condicionSets = calcularCondicionOptima(partidosGanadosPorEquipo, setsNecesariosParaGanar);
+                                escenarios[equipo] = {
+                                    minPartidos: partidosGanadosPorEquipo,
+                                    condicion: condicionSets,
+                                    detalle: `Necesita ${setsNecesariosParaGanar} sets de ${setsMaxEquipo} posibles`
+                                };
+                            }
+                            break; // Ya encontramos la opción mínima
+                            
+                        } else {
+                            // No puede ganar por sets, verificar puntos
+                            const setsEquipoConTodosLosPartidos = equipoActual.sets + setsMaxEquipo;
+                            
+                            if (setsEquipoConTodosLosPartidos === setsMaxRival) {
+                                // Empate en sets, decidir por puntos
+                                const puntosMaxRival = rivalActual.puntos + (partidosGanadosPorRival * 33); // 3 sets × 11 puntos
+                                const puntosNecesariosParaGanar = puntosMaxRival + 1 - equipoActual.puntos;
+                                const puntosMaxEquipo = partidosGanadosPorEquipo * 33; // Si gana todos los sets 11-0
+                                
+                                if (puntosNecesariosParaGanar <= puntosMaxEquipo) {
+                                    escenarios[equipo] = {
+                                        minPartidos: partidosGanadosPorEquipo,
+                                        condicion: `Ganar todos los ${setsMaxEquipo} sets con resultado 11-0`,
+                                        detalle: `Necesita ${puntosNecesariosParaGanar} puntos de ${puntosMaxEquipo} posibles para ganar por puntos`
+                                    };
+                                    break; // Ya encontramos la opción mínima
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -861,16 +877,56 @@
             return escenarios;
         }
 
+        function calcularCondicionOptima(partidosTotal, setsNecesarios) {
+            if (setsNecesarios === 0) {
+                return `Ganar ${partidosTotal} partidos (cualquier resultado)`;
+            }
+            
+            if (setsNecesarios === partidosTotal * 3) {
+                return `Ganar los ${partidosTotal} partidos 3-0`;
+            }
+            
+            if (setsNecesarios <= partidosTotal * 3) {
+                // Calcular la combinación óptima
+                const setsCedidosMaximos = (partidosTotal * 3) - setsNecesarios;
+                
+                if (setsCedidosMaximos >= partidosTotal * 2) {
+                    return `Ganar ${partidosTotal} partidos (pueden ser 3-2)`;
+                } else if (setsCedidosMaximos === 0) {
+                    return `Ganar los ${partidosTotal} partidos 3-0`;
+                } else {
+                    // Calcular combinación específica
+                    const partidos3_2Max = Math.floor(setsCedidosMaximos / 2);
+                    const partidos3_0Min = partidosTotal - partidos3_2Max;
+                    
+                    if (partidos3_2Max === 0) {
+                        return `Ganar los ${partidosTotal} partidos 3-0`;
+                    } else if (partidos3_0Min === 0) {
+                        return `Ganar los ${partidosTotal} partidos (máximo 3-2)`;
+                    } else {
+                        return `Ganar ${partidos3_0Min} partidos 3-0 y máximo ${partidos3_2Max} partidos 3-2`;
+                    }
+                }
+            }
+            
+            return `Necesita ganar ${setsNecesarios} sets en ${partidosTotal} partidos`;
+        }
+
         function formatScenario(equipoNombre, escenario, partidosRestantes) {
             let texto = "";
-            if (escenario.minPartidos <= partidosRestantes) {
-                texto += `<p><strong>Ganar mínimo ${escenario.minPartidos} partidos</strong> (${escenario.motivo})</p>`;
-                if (escenario.detalleEscenario) {
-                    texto += `<div class="worst-case"><strong>Peor escenario considerado:</strong> ${escenario.detalleEscenario}</div>`;
-                }
-            } else {
+            
+            if (escenario.minPartidos > partidosRestantes) {
                 texto += '<p><strong>No puede ser campeón matemático</strong> con los partidos restantes.</p>';
+                return texto;
             }
+            
+            texto += `<p><strong>Mínimo para ser campeón: ${escenario.minPartidos} partidos</strong></p>`;
+            texto += `<p><em>${escenario.condicion}</em></p>`;
+            
+            if (escenario.detalle) {
+                texto += `<div class="worst-case">${escenario.detalle}</div>`;
+            }
+            
             return texto;
         }
 
@@ -887,13 +943,13 @@
                 const escenarios = calcularCampeonMatematico(resultados, partidosRestantes);
                 
                 texto += '<div class="scenario-item recreativo">';
-                texto += '<h5><i class="fas fa-target"></i> IES La Orden - Campeón matemático mínimo:</h5>';
+                texto += '<h5><i class="fas fa-target"></i> IES La Orden - Mínimo para ser campeón:</h5>';
                 texto += '<div class="min-requirements recreativo">';
                 texto += formatScenario("IES La Orden", escenarios.recreativo, partidosRestantes);
                 texto += '</div></div>';
                 
                 texto += '<div class="scenario-item">';
-                texto += '<h5><i class="fas fa-target"></i> Cartagena - Campeón matemático mínimo:</h5>';
+                texto += '<h5><i class="fas fa-target"></i> Cartagena - Mínimo para ser campeón:</h5>';
                 texto += '<div class="min-requirements">';
                 texto += formatScenario("Cartagena", escenarios.cartagena, partidosRestantes);
                 texto += '</div></div>';
@@ -913,10 +969,10 @@
 
             if (escenarios.recreativo.minPartidos === 0 && partidosRestantes > 0) {
                 campeon = 'Recreativo IES La Orden';
-                razon = `Campeón matemático: Ya es imposible que pierda ${escenarios.recreativo.motivo}`;
+                razon = `Campeón matemático: ${escenarios.recreativo.condicion}`;
             } else if (escenarios.cartagena.minPartidos === 0 && partidosRestantes > 0) {
                 campeon = 'Puertas Padilla Cartagena';
-                razon = `Campeón matemático: Ya es imposible que pierda ${escenarios.cartagena.motivo}`;
+                razon = `Campeón matemático: ${escenarios.cartagena.condicion}`;
             } else if (partidosRestantes === 0) {
                 if (resultados.recreativo.partidos > resultados.cartagena.partidos) {
                     campeon = 'Recreativo IES La Orden';
