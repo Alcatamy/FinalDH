@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Final División de Honor 2025 - Calculadora Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>Final División de Honor 2025 - Calculadora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <meta name="theme-color" content="#667eea">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body data-theme="light">
+<body>
     <!-- Loading Screen -->
     <div id="loading-screen" class="loading-screen">
         <div class="loading-content">
@@ -21,29 +20,21 @@
         </div>
     </div>
 
-    <!-- Confetti y partículas -->
+    <!-- Confetti Container -->
     <div id="confetti-container"></div>
-    <div id="particles-container"></div>
 
-    <!-- Controls superiores -->
+    <!-- Top Controls -->
     <div class="top-controls">
         <button id="theme-toggle" class="control-btn" title="Cambiar tema">
             <i class="fas fa-moon"></i>
         </button>
-        <button id="fullscreen-toggle" class="control-btn" title="Pantalla completa">
-            <i class="fas fa-expand"></i>
-        </button>
         <button id="sound-toggle" class="control-btn active" title="Sonido">
             <i class="fas fa-volume-up"></i>
         </button>
-        <button id="export-pdf" class="control-btn" title="Exportar PDF">
-            <i class="fas fa-download"></i>
-        </button>
     </div>
 
-    <!-- Header mejorado -->
+    <!-- Header -->
     <header class="main-header">
-        <div class="header-background"></div>
         <div class="header-content">
             <img src="https://liga.badminton.es/wp-content/uploads/2022/09/LOGO-FESBA.png" alt="FESBA" class="fesba-logo">
             <h1 class="title-animated">FINAL DIVISIÓN DE HONOR 2025</h1>
@@ -70,35 +61,13 @@
         </div>
     </header>
 
-    <!-- Cronómetro y estado del partido -->
-    <div class="match-status">
-        <div class="timer-section">
-            <i class="fas fa-clock"></i>
-            <span id="match-timer">00:00:00</span>
-            <button id="timer-control" class="timer-btn">
-                <i class="fas fa-play"></i>
-            </button>
-        </div>
-        <div class="live-indicator">
-            <span class="live-dot"></span>
-            <span>EN VIVO</span>
-        </div>
-    </div>
-
-    <!-- Teams section mejorada -->
+    <!-- Teams Section -->
     <div class="teams-section">
         <div class="team ppc-team">
             <div class="team-header">
                 <img src="https://liga.badminton.es/wp-content/uploads/2022/12/Logo-Puertas-Padilla-Cartagena.png" alt="PPC">
                 <div class="team-info">
                     <h3>Puertas Padilla Cartagena</h3>
-                    <div class="team-form">
-                        <span class="form-indicator loss">D</span>
-                        <span class="form-indicator win">V</span>
-                        <span class="form-indicator win">V</span>
-                        <span class="form-indicator loss">D</span>
-                        <span class="form-indicator win">V</span>
-                    </div>
                 </div>
             </div>
             <div class="team-stats">
@@ -119,10 +88,6 @@
                     <div class="stat-label">Puntos</div>
                 </div>
             </div>
-            <div class="probability-bar">
-                <div class="probability-fill ppc-prob" id="ppc-probability" style="width: 35%"></div>
-                <span class="probability-text" id="ppc-prob-text">35%</span>
-            </div>
         </div>
 
         <div class="vs-section">
@@ -131,9 +96,6 @@
                     <span id="global-score-text">0 - 1</span>
                 </div>
                 <div class="score-label">Encuentros Globales</div>
-                <div class="momentum-indicator" id="momentum">
-                    <div class="momentum-bar"></div>
-                </div>
             </div>
         </div>
 
@@ -142,13 +104,6 @@
                 <img src="https://liga.badminton.es/wp-content/uploads/2022/09/IES-La-Orden.png" alt="IES">
                 <div class="team-info">
                     <h3>Recreativo IES La Orden</h3>
-                    <div class="team-form">
-                        <span class="form-indicator win">V</span>
-                        <span class="form-indicator win">V</span>
-                        <span class="form-indicator loss">D</span>
-                        <span class="form-indicator win">V</span>
-                        <span class="form-indicator win">V</span>
-                    </div>
                 </div>
             </div>
             <div class="team-stats">
@@ -169,33 +124,16 @@
                     <div class="stat-label">Puntos</div>
                 </div>
             </div>
-            <div class="probability-bar">
-                <div class="probability-fill ies-prob" id="ies-probability" style="width: 65%"></div>
-                <span class="probability-text" id="ies-prob-text">65%</span>
-            </div>
         </div>
     </div>
 
-    <!-- Gráfico de progreso del partido -->
-    <div class="match-progress">
-        <h3><i class="fas fa-chart-line"></i> Progreso del Encuentro</h3>
-        <div class="progress-chart" id="progress-chart">
-            <canvas id="progress-canvas" width="800" height="200"></canvas>
-        </div>
-    </div>
-
-    <!-- Matches container mejorado -->
+    <!-- Matches Container -->
     <div class="matches-container">
-        <!-- Los 7 partidos con diseño mejorado -->
         <div class="match-card" data-match="DX">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-users"></i>
-                    <span>Dobles Mixtos</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Dobles Mixtos (DX)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -210,22 +148,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
-        <!-- Repetir para los otros 6 partidos con iconos apropiados -->
         <div class="match-card" data-match="DF">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-female"></i>
-                    <span>Dobles Femenino</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Dobles Femenino (DF)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -240,22 +169,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
-        <!-- Continúo con los demás partidos... -->
         <div class="match-card" data-match="DM">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-male"></i>
-                    <span>Dobles Masculino</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Dobles Masculino (DM)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -270,21 +190,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
         <div class="match-card" data-match="IF2">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-user"></i>
-                    <span>Individual Femenino 2</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Individual Femenino 2 (IF2)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -299,21 +211,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
         <div class="match-card" data-match="IM2">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-user"></i>
-                    <span>Individual Masculino 2</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Individual Masculino 2 (IM2)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -328,21 +232,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
         <div class="match-card" data-match="IF1">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-star"></i>
-                    <span>Individual Femenino 1</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Individual Femenino 1 (IF1)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -357,21 +253,13 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
 
         <div class="match-card" data-match="IM1">
             <div class="match-header">
                 <div class="match-type">
                     <i class="fas fa-crown"></i>
-                    <span>Individual Masculino 1</span>
-                </div>
-                <div class="match-status-indicator">
-                    <span class="status-dot pending"></span>
-                    <span class="status-text">Pendiente</span>
+                    <span>Individual Masculino 1 (IM1)</span>
                 </div>
             </div>
             <div class="sets-container">
@@ -386,14 +274,10 @@
                 </div>
             </div>
             <div class="match-result"></div>
-            <div class="match-stats">
-                <div class="duration"><i class="fas fa-clock"></i> <span>--:--</span></div>
-                <div class="rallies"><i class="fas fa-exchange-alt"></i> <span>0 rallies</span></div>
-            </div>
         </div>
     </div>
 
-    <!-- Banner de campeón mejorado -->
+    <!-- Champion Banner -->
     <div class="champion-banner" id="champion-banner" style="display: none;">
         <div class="champion-background"></div>
         <div class="champion-content">
@@ -402,99 +286,19 @@
             </div>
             <h2 id="champion-text"></h2>
             <p>¡CAMPEÓN DIVISIÓN DE HONOR 2025!</p>
-            <div class="champion-stats" id="champion-stats"></div>
-            <div class="champion-actions">
-                <button class="share-btn" onclick="shareResult()">
-                    <i class="fas fa-share-alt"></i> Compartir
-                </button>
-                <button class="celebration-btn" onclick="triggerCelebration()">
-                    <i class="fas fa-star"></i> ¡Celebrar!
-                </button>
-            </div>
         </div>
     </div>
 
-    <!-- Análisis mejorado -->
-    <div class="analysis-section">
-        <div class="analysis-tabs">
-            <button class="tab-btn active" data-tab="scenarios">
-                <i class="fas fa-route"></i> Escenarios
-            </button>
-            <button class="tab-btn" data-tab="statistics">
-                <i class="fas fa-chart-bar"></i> Estadísticas
-            </button>
-            <button class="tab-btn" data-tab="timeline">
-                <i class="fas fa-timeline"></i> Timeline
-            </button>
-            <button class="tab-btn" data-tab="predictions">
-                <i class="fas fa-magic"></i> Predicciones
-            </button>
-        </div>
-
-        <div class="tab-content active" id="scenarios-tab">
-            <h3>Análisis de Escenarios</h3>
+    <!-- Scenarios Section -->
+    <div class="scenarios-section">
+        <details>
+            <summary>Análisis de Escenarios</summary>
             <div id="scenarios-content">
                 <p>Introduce resultados para ver qué necesita cada equipo para ser campeón.</p>
             </div>
-        </div>
-
-        <div class="tab-content" id="statistics-tab">
-            <h3>Estadísticas Detalladas</h3>
-            <div class="stats-grid">
-                <div class="stat-detailed">
-                    <h4>Eficiencia por Sets</h4>
-                    <canvas id="sets-chart" width="300" height="200"></canvas>
-                </div>
-                <div class="stat-detailed">
-                    <h4>Puntos por Partido</h4>
-                    <canvas id="points-chart" width="300" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="timeline-tab">
-            <h3>Timeline del Encuentro</h3>
-            <div id="timeline-content">
-                <div class="timeline-item">
-                    <div class="timeline-time">10:00</div>
-                    <div class="timeline-event">Inicio del encuentro</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="predictions-tab">
-            <h3>Predicciones IA</h3>
-            <div id="predictions-content">
-                <div class="prediction-card">
-                    <h4>Modelo Predictivo</h4>
-                    <p>Basado en el historial y forma actual...</p>
-                    <div class="prediction-values">
-                        <div class="prediction-team">
-                            <span>PPC</span>
-                            <div class="prediction-bar">
-                                <div class="prediction-fill" style="width: 45%"></div>
-                            </div>
-                            <span>45%</span>
-                        </div>
-                        <div class="prediction-team">
-                            <span>IES</span>
-                            <div class="prediction-bar">
-                                <div class="prediction-fill" style="width: 55%"></div>
-                            </div>
-                            <span>55%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </details>
     </div>
 
-    <!-- Toast notifications -->
-    <div id="toast-container"></div>
-
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
-
