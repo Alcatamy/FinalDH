@@ -28,6 +28,29 @@
             overflow: hidden;
         }
 
+        /* Banner de campeón matemático */
+        .champion-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            z-index: 1000;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
         .header {
             background: linear-gradient(45deg, #1e3c72, #2a5298);
             color: white;
@@ -159,11 +182,38 @@
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .partido.finalizado {
             border-color: #28a745;
             background: #f8fff8;
+        }
+
+        /* Estilos para ganadores de partidos */
+        .partido.winner-recreativo {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .partido.winner-cartagena {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #cce5ff, #b3d7ff);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .winner-label {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #ffd700;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: bounce 1s ease-out;
         }
 
         .partido-header {
@@ -183,24 +233,26 @@
 
         .partido-content {
             display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 20px;
+            grid-template-columns: 140px 1fr;
+            gap: 15px;
             align-items: start;
         }
 
         .equipos-labels {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            padding-top: 5px;
         }
 
         .equipo-label {
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            height: 35px;
+            height: 40px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            padding-right: 8px;
         }
 
         .equipo-label.cartagena {
@@ -213,27 +265,30 @@
 
         .sets-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 8px;
+            max-width: 100%;
         }
 
         .set {
             background: #f8f9fa;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
+            min-height: 100px;
         }
 
         .set-inputs {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             margin-top: 8px;
+            align-items: center;
         }
 
         .set-input {
-            width: 45px;
-            height: 35px;
+            width: 50px;
+            height: 40px;
             text-align: center;
             border: 2px solid #ddd;
             border-radius: 5px;
@@ -244,6 +299,7 @@
         .set-input:focus {
             outline: none;
             border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
         }
 
         .champion-section {
@@ -327,21 +383,46 @@
             .header .subtitle { font-size: 1rem; }
             .team-logo img { width: 60px; height: 60px; }
             .vs { font-size: 1.5rem; }
-            .partido-content { grid-template-columns: 120px 1fr; }
-            .equipos-labels { gap: 10px; }
+            .partido-content { 
+                grid-template-columns: 110px 1fr; 
+                gap: 10px;
+            }
+            .equipos-labels { gap: 8px; }
+            .equipo-label { 
+                height: 35px; 
+                font-size: 0.85rem;
+            }
             .champion-section h2 { font-size: 2rem; }
+            .sets-container { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); }
+            .set-input { width: 45px; height: 35px; }
         }
 
         @media (max-width: 480px) {
             .container { margin: 10px; }
             .header, .results-section { padding: 20px; }
             .logos { padding: 15px; }
-            .partido-content { grid-template-columns: 1fr; }
-            .equipos-labels { flex-direction: row; justify-content: space-around; }
+            .partido-content { 
+                grid-template-columns: 1fr; 
+                gap: 15px;
+            }
+            .equipos-labels { 
+                flex-direction: row; 
+                justify-content: space-around;
+                gap: 20px;
+            }
+            .equipo-label { 
+                justify-content: center;
+                padding-right: 0;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Banner de campeón matemático -->
+    <div id="championBanner" class="champion-banner">
+        <i class="fas fa-trophy"></i> ¡CAMPEÓN MATEMÁTICO DETERMINADO!
+    </div>
+
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-trophy"></i> Final División de Honor</h1>
@@ -618,7 +699,7 @@
             });
         }
 
-        function recalcularPartido(partidoId) {
+        function recalcularPartido(partidoId) {[1]
             // Recalcular sets ganados
             partidosVuelta[partidoId].setsRecreativo = 0;
             partidosVuelta[partidoId].setsCartagena = 0;
@@ -631,20 +712,110 @@
                 }
             });
             
+            const partidoElement = document.getElementById(`partido-${partidoId}`);
+            const marcador = document.getElementById(`marcador-${partidoId}`);
+            
             // Actualizar marcador
-            document.getElementById(`marcador-${partidoId}`).textContent = 
-                `${partidosVuelta[partidoId].setsCartagena} - ${partidosVuelta[partidoId].setsRecreativo}`;
+            marcador.textContent = `${partidosVuelta[partidoId].setsCartagena} - ${partidosVuelta[partidoId].setsRecreativo}`;
             
             // Verificar si el partido ha terminado
             const finalizado = partidosVuelta[partidoId].setsRecreativo === 3 || partidosVuelta[partidoId].setsCartagena === 3;
             partidosVuelta[partidoId].finalizado = finalizado;
             
-            const partidoElement = document.getElementById(`partido-${partidoId}`);
+            // Remover clases anteriores
+            partidoElement.classList.remove('finalizado', 'winner-recreativo', 'winner-cartagena');
+            
+            // Remover etiqueta de ganador anterior
+            const labelAnterior = partidoElement.querySelector('.winner-label');
+            if (labelAnterior) {
+                labelAnterior.remove();
+            }
+            
             if (finalizado) {
                 partidoElement.classList.add('finalizado');
-            } else {
-                partidoElement.classList.remove('finalizado');
+                
+                // Determinar ganador y añadir clase
+                let ganador = '';
+                if (partidosVuelta[partidoId].setsRecreativo > partidosVuelta[partidoId].setsCartagena) {
+                    partidoElement.classList.add('winner-recreativo');
+                    ganador = 'IES La Orden';
+                } else {
+                    partidoElement.classList.add('winner-cartagena');
+                    ganador = 'Cartagena';
+                }
+                
+                // Añadir etiqueta de ganador
+                const winnerLabel = document.createElement('div');
+                winnerLabel.className = 'winner-label';
+                winnerLabel.innerHTML = `<i class="fas fa-crown"></i> Ganador: ${ganador}`;
+                partidoElement.appendChild(winnerLabel);
             }
+        }
+
+        function verificarCampeon() {[2][3]
+            const resultados = calcularResultadosFinal();
+            const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
+            
+            // Calcular máximos posibles para cada equipo
+            const maxPartidosRecreativo = resultados.recreativo.partidos + partidosRestantes;
+            const maxPartidosCartagena = resultados.cartagena.partidos + partidosRestantes;
+            
+            let campeon = null;
+            let razon = '';
+            
+            // Verificar por partidos ganados
+            if (resultados.recreativo.partidos > maxPartidosCartagena) {
+                campeon = 'Recreativo IES La Orden';
+                razon = `Por partidos ganados: ${resultados.recreativo.partidos} vs máximo posible ${maxPartidosCartagena}`;
+            } else if (resultados.cartagena.partidos > maxPartidosRecreativo) {
+                campeon = 'Puertas Padilla Cartagena';
+                razon = `Por partidos ganados: ${resultados.cartagena.partidos} vs máximo posible ${maxPartidosRecreativo}`;
+            }
+            // Si hay empate en partidos, verificar por sets
+            else if (resultados.recreativo.partidos === resultados.cartagena.partidos && partidosRestantes === 0) {
+                if (resultados.recreativo.sets > resultados.cartagena.sets) {
+                    campeon = 'Recreativo IES La Orden';
+                    razon = `Por sets ganados: ${resultados.recreativo.sets} vs ${resultados.cartagena.sets}`;
+                } else if (resultados.cartagena.sets > resultados.recreativo.sets) {
+                    campeon = 'Puertas Padilla Cartagena';
+                    razon = `Por sets ganados: ${resultados.cartagena.sets} vs ${resultados.recreativo.sets}`;
+                } else {
+                    // Empate en sets, decidir por puntos
+                    if (resultados.recreativo.puntos > resultados.cartagena.puntos) {
+                        campeon = 'Recreativo IES La Orden';
+                        razon = `Por puntos ganados: ${resultados.recreativo.puntos} vs ${resultados.cartagena.puntos}`;
+                    } else {
+                        campeon = 'Puertas Padilla Cartagena';
+                        razon = `Por puntos ganados: ${resultados.cartagena.puntos} vs ${resultados.recreativo.puntos}`;
+                    }
+                }
+            }
+            
+            const banner = document.getElementById('championBanner');
+            if (campeon) {
+                mostrarCampeon(campeon, razon);
+                banner.innerHTML = `<i class="fas fa-trophy"></i> ¡CAMPEÓN MATEMÁTICO: ${campeon}!`;
+                banner.style.display = 'block';
+                
+                // Scroll automático al banner si no es visible
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
+            } else {
+                const section = document.getElementById('championSection');
+                section.classList.remove('show');
+                banner.style.display = 'none';
+            }
+        }
+
+        function mostrarCampeon(campeon, razon) {
+            const section = document.getElementById('championSection');
+            const name = document.getElementById('championName');
+            const details = document.getElementById('championDetails');
+            
+            name.textContent = `¡${campeon} CAMPEÓN!`;
+            details.textContent = razon;
+            section.classList.add('show');
         }
 
         function calcularResultadosFinal() {
@@ -755,64 +926,6 @@
             `;
         }
 
-        function verificarCampeon() {
-            const resultados = calcularResultadosFinal();
-            const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
-            
-            // Calcular máximos posibles para cada equipo
-            const maxPartidosRecreativo = resultados.recreativo.partidos + partidosRestantes;
-            const maxPartidosCartagena = resultados.cartagena.partidos + partidosRestantes;
-            
-            let campeon = null;
-            let razon = '';
-            
-            // Verificar por partidos ganados
-            if (resultados.recreativo.partidos > maxPartidosCartagena) {
-                campeon = 'Recreativo IES La Orden';
-                razon = `Por partidos ganados: ${resultados.recreativo.partidos} vs máximo posible ${maxPartidosCartagena}`;
-            } else if (resultados.cartagena.partidos > maxPartidosRecreativo) {
-                campeon = 'Puertas Padilla Cartagena';
-                razon = `Por partidos ganados: ${resultados.cartagena.partidos} vs máximo posible ${maxPartidosRecreativo}`;
-            }
-            // Si hay empate en partidos, verificar por sets
-            else if (resultados.recreativo.partidos === resultados.cartagena.partidos && partidosRestantes === 0) {
-                if (resultados.recreativo.sets > resultados.cartagena.sets) {
-                    campeon = 'Recreativo IES La Orden';
-                    razon = `Por sets ganados: ${resultados.recreativo.sets} vs ${resultados.cartagena.sets}`;
-                } else if (resultados.cartagena.sets > resultados.recreativo.sets) {
-                    campeon = 'Puertas Padilla Cartagena';
-                    razon = `Por sets ganados: ${resultados.cartagena.sets} vs ${resultados.recreativo.sets}`;
-                } else {
-                    // Empate en sets, decidir por puntos
-                    if (resultados.recreativo.puntos > resultados.cartagena.puntos) {
-                        campeon = 'Recreativo IES La Orden';
-                        razon = `Por puntos ganados: ${resultados.recreativo.puntos} vs ${resultados.cartagena.puntos}`;
-                    } else {
-                        campeon = 'Puertas Padilla Cartagena';
-                        razon = `Por puntos ganados: ${resultados.cartagena.puntos} vs ${resultados.recreativo.puntos}`;
-                    }
-                }
-            }
-            
-            if (campeon) {
-                mostrarCampeon(campeon, razon);
-            } else {
-                // Ocultar sección campeón si no hay campeón claro
-                const section = document.getElementById('championSection');
-                section.classList.remove('show');
-            }
-        }
-
-        function mostrarCampeon(campeon, razon) {
-            const section = document.getElementById('championSection');
-            const name = document.getElementById('championName');
-            const details = document.getElementById('championDetails');
-            
-            name.textContent = `¡${campeon} CAMPEÓN!`;
-            details.textContent = razon;
-            section.classList.add('show');
-        }
-
         function actualizarEscenarios() {
             const resultados = calcularResultadosFinal();
             const partidosRestantes = Object.values(partidosVuelta).filter(p => !p.finalizado).length;
@@ -823,40 +936,58 @@
             texto += `<p><strong>Partidos restantes:</strong> ${partidosRestantes}</p>`;
             
             if (partidosRestantes > 0) {
-                texto += '<h4>Para ser Campeón (mínimo necesario):</h4>';
+                texto += '<h4>Escenarios para ser Campeón:</h4>';
                 
-                // Calcular lo mínimo que necesita cada equipo para ganar
-                // Para IES La Orden
-                const minPartidosNecesariosIES = Math.max(0, resultados.cartagena.partidos + 1 - resultados.recreativo.partidos);
-                const partidosRestantesParaIES = Math.min(minPartidosNecesariosIES, partidosRestantes);
+                // Análisis detallado por criterios de desempate
+                const diffPartidos = resultados.recreativo.partidos - resultados.cartagena.partidos;
                 
-                // Para Cartagena  
-                const minPartidosNecesariosCartagena = Math.max(0, resultados.recreativo.partidos + 1 - resultados.cartagena.partidos);
-                const partidosRestantesParaCartagena = Math.min(minPartidosNecesariosCartagena, partidosRestantes);
-                
-                if (partidosRestantesParaIES <= partidosRestantes) {
-                    texto += `<p><strong>IES La Orden</strong> necesita ganar al menos <strong>${partidosRestantesParaIES}</strong> de los ${partidosRestantes} partidos restantes para ser campeón por partidos</p>`;
+                texto += '<h5>Para IES La Orden:</h5>';
+                if (diffPartidos > 0) {
+                    texto += `<p>• Ya tiene ventaja en partidos (${resultados.recreativo.partidos} vs ${resultados.cartagena.partidos}). <strong>Necesita 0 partidos más</strong> para ser campeón</p>`;
                 } else {
-                    texto += `<p><strong>IES La Orden</strong> no puede ganar por partidos (necesitaría ${minPartidosNecesariosIES} pero solo quedan ${partidosRestantes})</p>`;
-                }
-                
-                if (partidosRestantesParaCartagena <= partidosRestantes) {
-                    texto += `<p><strong>Cartagena</strong> necesita ganar al menos <strong>${partidosRestantesParaCartagena}</strong> de los ${partidosRestantes} partidos restantes para ser campeón por partidos</p>`;
-                } else {
-                    texto += `<p><strong>Cartagena</strong> no puede ganar por partidos (necesitaría ${minPartidosNecesariosCartagena} pero solo quedan ${partidosRestantes})</p>`;
-                }
-                
-                if (partidosRestantesParaIES > partidosRestantes && partidosRestantesParaCartagena > partidosRestantes) {
-                    texto += `<p><strong>Empate en partidos garantizado.</strong> Se decidirá por sets ganados y luego por puntos</p>`;
-                    
-                    // Calcular diferencia actual en sets
-                    const diferenciaeSets = resultados.recreativo.sets - resultados.cartagena.sets;
-                    if (diferenciaeSets > 0) {
-                        texto += `<p>IES La Orden lleva ventaja de ${diferenciaeSets} sets</p>`;
-                    } else if (diferenciaeSets < 0) {
-                        texto += `<p>Cartagena lleva ventaja de ${Math.abs(diferenciaeSets)} sets</p>`;
+                    const partidosNecesarios = Math.abs(diffPartidos) + 1;
+                    if (partidosNecesarios <= partidosRestantes) {
+                        texto += `<p>• Necesita ganar <strong>al menos ${partidosNecesarios} partidos</strong> para superar a Cartagena</p>`;
                     } else {
-                        texto += `<p>Empate en sets. Se decidirá por puntos ganados</p>`;
+                        texto += `<p>• No puede ganar por partidos (necesitaría ${partidosNecesarios}, quedan ${partidosRestantes})</p>`;
+                        
+                        // Analizar empate
+                        const partidosParaEmpate = Math.abs(diffPartidos);
+                        if (partidosParaEmpate <= partidosRestantes) {
+                            const diffSets = resultados.recreativo.sets - resultados.cartagena.sets;
+                            const diffPuntos = resultados.recreativo.puntos - resultados.cartagena.puntos;
+                            
+                            if (diffSets > 0) {
+                                texto += `<p>• Ganando <strong>${partidosParaEmpate} partidos</strong> empataría y ganaría por sets</p>`;
+                            } else if (diffSets === 0 && diffPuntos > 0) {
+                                texto += `<p>• Ganando <strong>${partidosParaEmpate} partidos</strong> empataría y ganaría por puntos</p>`;
+                            }
+                        }
+                    }
+                }
+                
+                texto += '<h5>Para Cartagena:</h5>';
+                if (diffPartidos < 0) {
+                    texto += `<p>• Ya tiene ventaja en partidos (${resultados.cartagena.partidos} vs ${resultados.recreativo.partidos}). <strong>Necesita 0 partidos más</strong> para ser campeón</p>`;
+                } else {
+                    const partidosNecesarios = diffPartidos + 1;
+                    if (partidosNecesarios <= partidosRestantes) {
+                        texto += `<p>• Necesita ganar <strong>al menos ${partidosNecesarios} partidos</strong> para superar a IES La Orden</p>`;
+                    } else {
+                        texto += `<p>• No puede ganar por partidos (necesitaría ${partidosNecesarios}, quedan ${partidosRestantes})</p>`;
+                        
+                        // Analizar empate
+                        const partidosParaEmpate = diffPartidos;
+                        if (partidosParaEmpate <= partidosRestantes) {
+                            const diffSets = resultados.cartagena.sets - resultados.recreativo.sets;
+                            const diffPuntos = resultados.cartagena.puntos - resultados.recreativo.puntos;
+                            
+                            if (diffSets > 0) {
+                                texto += `<p>• Ganando <strong>${partidosParaEmpate} partidos</strong> empataría y ganaría por sets</p>`;
+                            } else if (diffSets === 0 && diffPuntos > 0) {
+                                texto += `<p>• Ganando <strong>${partidosParaEmpate} partidos</strong> empataría y ganaría por puntos</p>`;
+                            }
+                        }
                     }
                 }
             }
